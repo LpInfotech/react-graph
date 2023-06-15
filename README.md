@@ -17,5 +17,5 @@ Note:- **Make sure you have latest version of node js.**
 
 5. Your local react app is running on this port (http://localhost:3000)
 
-Note:- **Please make sure your server is running** else you get proxy error if you still getting proxy error then close client app and again start client app with this command (`npm start`) inside client folder.
+Note:- **Please make sure your server is running** else you get proxy error if you still getting proxy error then close client app and again start client app with this command `npm start` inside client folder.
 
