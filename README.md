@@ -3,7 +3,7 @@ Build Graph with React Js + MUI + Node JS
 
 ## Getting Started 
 
-### How to run 
+### How to run server and client app?
 
 Note:- **Make sure you have latest version of Node js.**
 
