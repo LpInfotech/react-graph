@@ -3,9 +3,9 @@ Build Graph with React Js + MUI + Node JS
 
 ## Getting Started 
 
-## How to run 
+### How to run 
 
-Note:- **Make sure you have latest version of node js.**
+Note:- **Make sure you have latest version of Node js.**
 
 1. First go inside server folder and run this command on terminal `npm i` and run `npm start`.
 
