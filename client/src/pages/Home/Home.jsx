@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormSelect from '../../components/Select/FormSelect';
+
 
 function Home() {
 	const candidatesData = useLoaderData();
@@ -90,9 +91,10 @@ function Home() {
 				>
 					<DataTable data={candidatesData} selectValue={value} setSelected={setSelected} />
 					<Box textAlign="right" sx={{my:3}}>
-					<Button variant="contained" component="a" href={"#as-link"} disabled={selected.length === 0 ? true:false }>
+					<Button variant="contained" component={Link} to={"test-selection"} disabled={selected.length === 0 ? true:false }>
 						Select List
-					</Button></Box>
+					</Button>
+					</Box>
 				</Container>
 			</Box>
 			{/* table */}
