@@ -12,7 +12,7 @@ Note:- **Make sure you have latest version of node js.**
 2. You will see your server is running on this port (http://localhost:9000) 
 
 3. How we check response data 
-   - Open this URL on your browser  [`http://localhost:9000/get/candidates`]
+   - Open this URL on your browser [`http://localhost:9000/get/candidates`]
    - If you are getting json data that means server is working. 
 
 4. After your server runs on local then go to client folder and again hit above commands.
