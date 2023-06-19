@@ -38,9 +38,8 @@ const columns = [
 ];
 
 
-export default function DataTable({ data, selectValue, setSelected }) {
-  const rows = data.data.colaboradores.filter(el => (!selectValue.department !== "" && el._NombreDepartamento.includes(selectValue.department))
-    && (!selectValue.hierarchy !== "" && el._NombreJerarquia.includes(selectValue.hierarchy)) && (!selectValue.position !== "" && el._CodigoCargo.includes(selectValue.position)) && (!selectValue.workBranch !== "" && el._NombreSucursal.includes(selectValue.workBranch))
+export default function DataTable({ data, selectValue, setSelected}) {
+  const rows = data.data.colaboradores.filter(el => (!selectValue._NombreDepartamento !== "" && el._NombreDepartamento.includes(selectValue._NombreDepartamento)) && (!selectValue._NombreJerarquia !== "" && el._NombreJerarquia.includes(selectValue._NombreJerarquia)) && (!selectValue._CodigoCargo !== "" && el._CodigoCargo.includes(selectValue._CodigoCargo)) && (!selectValue._NombreSucursal !== "" && el._NombreSucursal.includes(selectValue._NombreSucursal))
   );
 
   return (

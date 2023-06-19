@@ -5,7 +5,8 @@ import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
-function FormSelect({ value, name, handleChange,title, children }) {
+function FormSelect({ value, name, handleChange,title,data, children }) {
+	
 	return (
 		<FormControl fullWidth>
 			<Box id={name} fontWeight={600} textTransform="capitalize">
@@ -15,7 +16,11 @@ function FormSelect({ value, name, handleChange,title, children }) {
 				<MenuItem value="">
 					<em>None</em>
 				</MenuItem>
-				{children}
+				{data?.data?.colaboradores !== undefined ? data.data.colaboradores.filter((elm, index) => index === data.data.colaboradores.findIndex(element => element[`${name}`] === elm[`${name}`])).map((el) => (
+										<MenuItem key={el.can_id} value={el[`${name}`]}>
+										{el[`${name}`]}
+										</MenuItem>
+									)): ''}
 			</Select>
 		</FormControl>
 	);

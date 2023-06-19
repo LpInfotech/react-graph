@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData} from 'react-router-dom';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -9,17 +11,16 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormSelect from '../../components/Select/FormSelect';
 
-
 function Home() {
 	const candidatesData = useLoaderData();
 	const [value, setValue] = useState({
-		department: '',
-		hierarchy: '',
-		position: '',
-		workBranch: ''
+		_NombreDepartamento: '',
+		_NombreJerarquia: '',
+		_CodigoCargo: '',
+		_NombreSucursal: ''
 	});
 
-	const [selected,setSelected] = useState([]);
+	const [selected, setSelected] = useState([]);
 
 	// handle on change
 	const handleChange = (e) => setValue({ ...value, [e.target.name]: e.target.value });
@@ -37,44 +38,48 @@ function Home() {
 					{/* grid */}
 					<Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 						<Grid item xs={12}>
-							<Typography variant="h4" fontWeight={600} marginBottom={3}>Candidate Details</Typography>
-							<Typography variant="h6" fontWeight={500} marginBottom={2}>Select Filter</Typography>
+							<Typography variant="h4" fontWeight={600} marginBottom={3}>
+								Candidate Details
+							</Typography>
+							<Typography variant="h6" fontWeight={500} marginBottom={2}>
+								Select Filter
+							</Typography>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
-								<FormSelect name="department" value={value.department} handleChange={handleChange} title="department">
-									{candidatesData.data.colaboradores.filter((elm, index) => index === candidatesData.data.colaboradores.findIndex(element => element._NombreDepartamento === elm._NombreDepartamento)).map((el) => (
-										<MenuItem key={el.can_id} value={el._NombreDepartamento}>
-											{el._NombreDepartamento}
-										</MenuItem>
-									))}
-								</FormSelect>
+							<FormSelect
+								name="_NombreDepartamento"
+								value={value._NombreDepartamento}
+								handleChange={handleChange}
+								title="department"
+								data={candidatesData}
+							></FormSelect>
 						</Grid>
 						<Grid item xs={12} sm={6} md={3}>
-						<FormSelect name="hierarchy" value={value.hierarchy} handleChange={handleChange} title="hierarchy">
-						{candidatesData.data.colaboradores.filter((elm, index) => index === candidatesData.data.colaboradores.findIndex(element => element._NombreJerarquia === elm._NombreJerarquia)).map((el) => (
-										<MenuItem key={el.can_id} value={el._NombreJerarquia}>
-											{el._NombreJerarquia}
-										</MenuItem>
-									))}
-								</FormSelect>
+							<FormSelect
+								name="_NombreJerarquia"
+								value={value._NombreJerarquia}
+								handleChange={handleChange}
+								title="hierarchy"
+								data={candidatesData}
+							></FormSelect>
 						</Grid>
 						<Grid item xs={12} sm={6} md={3}>
-						<FormSelect name="position" value={value.position} handleChange={handleChange} title="position">
-						{candidatesData.data.colaboradores.filter((elm, index) => index === candidatesData.data.colaboradores.findIndex(element => element._CodigoCargo === elm._CodigoCargo)).map((el) => (
-										<MenuItem key={el.can_id} value={el._CodigoCargo}>
-											{el._CodigoCargo}
-										</MenuItem>
-									))}
-								</FormSelect>
+							<FormSelect
+								name="_CodigoCargo"
+								value={value._CodigoCargo}
+								handleChange={handleChange}
+								title="position"
+								data={candidatesData}
+							></FormSelect>
 						</Grid>
 						<Grid item xs={12} sm={6} md={3}>
-						<FormSelect name="workBranch" value={value.workBranch} handleChange={handleChange} title="work branch">
-						{candidatesData.data.colaboradores.filter((elm, index) => index === candidatesData.data.colaboradores.findIndex(element => element._NombreSucursal === elm._NombreSucursal)).map((el) => (
-										<MenuItem key={el.can_id} value={el._NombreSucursal}>
-											{el._NombreSucursal}
-										</MenuItem>
-									))}
-								</FormSelect>
+							<FormSelect
+								name="_NombreSucursal"
+								value={value._NombreSucursal}
+								handleChange={handleChange}
+								title="work branch"
+								data={candidatesData}
+							></FormSelect>
 						</Grid>
 					</Grid>
 					{/* grid */}
@@ -90,10 +95,16 @@ function Home() {
 					}}
 				>
 					<DataTable data={candidatesData} selectValue={value} setSelected={setSelected} />
-					<Box textAlign="right" sx={{my:3}}>
-					<Button variant="contained" component={Link} to={"test-selection"} disabled={selected.length === 0 ? true:false }>
-						Select List
-					</Button>
+					<Box textAlign="right" sx={{ my: 3 }}>
+						<Button
+							variant="contained"
+							component={Link}
+							to="/test-selection"
+							state={selected}
+							disabled={selected.length === 0 ? true : false}
+						>
+							Select List
+						</Button>
 					</Box>
 				</Container>
 			</Box>
