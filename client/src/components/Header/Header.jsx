@@ -13,12 +13,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useTheme } from '@mui/material/styles';
 import { drawerWidth,navItems } from '../../config';
 
 function DrawerAppBar({window,title}) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const theme = useTheme();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -46,7 +44,7 @@ function DrawerAppBar({window,title}) {
 
   return (
     <Box component="header" sx={{ display: 'flex' }}>
-      <AppBar component="nav" sx={{backgroundColor:theme.palette.primary.main}}>
+      <AppBar component="nav">
         <Toolbar>
         <Typography
             variant="h6"
