@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLoaderData} from 'react-router-dom';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import DataTable from '../../components/Table/Table';
+import Table from '../../components/Table/Table';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -94,7 +91,7 @@ function Home() {
 						py: 3
 					}}
 				>
-					<DataTable data={candidatesData} selectValue={value} setSelected={setSelected} />
+					<Table data={candidatesData} selectValue={value} setSelected={setSelected} />
 					<Box textAlign="right" sx={{ my: 3 }}>
 						<Button
 							variant="contained"
