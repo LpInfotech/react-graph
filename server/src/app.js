@@ -1,8 +1,6 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-const ProfileController = require('./controllers/profile.controller');
-
 
 // server
 const server = http.createServer(async function (req, res) {
