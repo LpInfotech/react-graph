@@ -17,7 +17,7 @@ function Layout() {
 	  <ThemeProvider theme={theme}>
      {globalStyles}
       <CssBaseline />
-      <Box  sx={{
+      <Box sx={{
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
