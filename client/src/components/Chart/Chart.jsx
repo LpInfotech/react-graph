@@ -1,4 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef,useImperativeHandle, useRef, useState} from 'react';
+
 import {
 	Chart as ChartJS,
 	LinearScale,
@@ -9,11 +10,13 @@ import {
 	Legend,
 	Tooltip,
 	LineController,
-	BarController
+	BarController,
+	RadialLinearScale,
+	LogarithmicScale
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { Chart } from 'react-chartjs-2';
-import { useEffect } from 'react';
+import { Chart} from 'react-chartjs-2';
+
 
 // register controller
 ChartJS.register(
@@ -26,46 +29,71 @@ ChartJS.register(
 	Tooltip,
 	LineController,
 	BarController,
-	ChartDataLabels
+	ChartDataLabels,
+	RadialLinearScale,
+	LogarithmicScale
 );
 
 // chart config
 const config = {
+	maintainAspectRatio: true,
 	categoryPercentage: 100,
 	barPercentage: 100,
 	indexAxis: 'y',
+	interaction: {
+		mode: 'nearest'
+},
 	plugins: {
+		datalabels: {
+				font: {
+						size: 16.5,
+						weight:600
+				},
+		},
 		legend: {
-			display: false
+			display: false,
 		},
 		title: {
 			display: true
 		},
 		tooltip: {
-			filter: (tooltipItem) => tooltipItem.datasetIndex === 0
-		}
+			filter: (tooltipItem) => tooltipItem.datasetIndex === 0,
+			callbacks: {
+				label: (tooltipItems) => {
+					return tooltipItems.raw.name[0].can_nombre;
+				},
+			}
+		},
 	},
 	responsive: true,
 	scales: {
 		x: {
+			title: { display: true, text: '9 Box' },
 			beginAtZero: true,
 			stacked: true,
 			grid: {
 				display: false
-			}
+			},
+			ticks: {
+				display: false,
+		}
 		},
-		y: {
+		y: { 
 			stacked: true,
-			title: { display: false, text: 'Value' },
+			title: { display: true, text: '9 Box' },
 			grid: {
 				display: false
-			}
+			},
+			ticks: {
+				display: false,
+		},
 		}
 	}
 };
 
-const BarChart = forwardRef(function BarChart({ value }, ref) {
+const BarChart = forwardRef(function BarChart({value,bubblePosition}, ref) {
 	const [options, setOptions] = useState(config);
+
 	const initialData = {
 		datasets: [
 			{
@@ -73,12 +101,7 @@ const BarChart = forwardRef(function BarChart({ value }, ref) {
 				backgroundColor: 'rgba(53, 162, 235, 1)',
 				borderWidth: 1,
 				fill: false,
-				data: [
-					{ x: 85, y: 30, r: 10,label:1},
-					{ x: 20, y: 20, r: 10,label:2},
-					{ x: 15, y: 45, r: 10,label:3 },
-					{ x: 15, y: 95, r: 10,label:4 }
-				]
+				data: [bubblePosition]
 			},
 			{
 				type: 'bar',
@@ -110,6 +133,7 @@ const BarChart = forwardRef(function BarChart({ value }, ref) {
 			}
 		]
 	};
+
 	const [data, setData] = useState(initialData);
 	const chartRef = useRef(null);
 
@@ -117,29 +141,11 @@ const BarChart = forwardRef(function BarChart({ value }, ref) {
 		return {
 			update() {
 				setOptions({ ...options, indexAxis: value.view }); 
-				setData(initialData);
+			setData(initialData);
 				chartRef.current.update();
-			}
+			},
 		};
 	});
-
-	// const handleClick = () => {
-	// 	setOptions({ ...options, indexAxis: options.indexAxis === 'x' ? 'y' : 'x' });
-	// 	data.datasets
-	// 		.filter((el) => el.type !== 'bubble')
-	// 		.forEach((el) => {
-	// 			if (options.indexAxis === 'x') {
-	// 				el.data[0].x = el.data[0].y;
-	// 				el.data[0].y = 0;
-	// 			} else {
-	// 				el.data[0].y = el.data[0].x;
-	// 				el.data[0].x = 0;
-	// 			}
-	// 		});
-	// 	// chartRef.current.update()
-	// };
-
-
 
 	return (
 		<>

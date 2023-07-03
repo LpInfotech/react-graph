@@ -102,7 +102,7 @@ const server = http.createServer(async function (req, res) {
 
 			case parseUrl.pathname === '/get/apl' && req.method === 'GET':
 				{
-					fs.readFile(__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${parseUrl.query.id}-28086.json`, 'utf8', async function (err, data) {
+					fs.readFile(__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${parseUrl.query.id}.json`, 'utf8', async function (err, data) {
 						if (err) {
 							console.log('File read failed:', err);
 							throw new Error('File read failed');
@@ -128,7 +128,7 @@ const server = http.createServer(async function (req, res) {
 		
 					break;
 
-					case parseUrl.pathname === '/get/apl-razi' && req.method === 'GET':
+					case parseUrl.pathname === '/get/test' && req.method === 'GET':
 						
 						{
 							fs.readFile(__dirname + `/db/ligarprueb-json/ligarprueba_${parseUrl.query.id}.json`, 'utf8', async function (err, data) {

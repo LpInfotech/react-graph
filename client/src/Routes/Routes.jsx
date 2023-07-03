@@ -17,6 +17,7 @@ export  const router = createBrowserRouter([
     Component: Layout,
     children: [
       {
+        path:'/',
         index: true,
         Component: Home,
         loader: async () => {return await fetch('/get/candidates').then(response=>response.json()).then(data=>data[0].response).catch(e=>console.log(e))}

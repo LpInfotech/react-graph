@@ -12,23 +12,31 @@ import { FormHelperText } from '@mui/material';
 import BarChart from '../../components/Chart/Chart';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
+import { flushSync } from 'react-dom';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import {axis} from '../../config';
+
+
 
 function TestSelection() {
 	const routeData = useLoaderData();
 	const navigate = useNavigate();
 	const { state } = useLocation();
-  const chartRef = useRef(null)
+	const chartRef = useRef(null);
+
 	const [value, setValue] = useState({
 		xAxis: 'razi',
 		yAxis: 'performance',
 		profile: '',
 		norm: '',
-		candidate: '',
+		candidates: [],
 		low: 25,
 		average: 25,
 		high: 50,
 		view: 'y'
 	});
+
+	const [position, setPosition] = useState([]);
 
 	const [isValid, setValid] = useState({
 		profile: false,
@@ -36,26 +44,62 @@ function TestSelection() {
 		chartError: false
 	});
 
-	const [data, setData] = useState([]);
+	const [candidates, setCandidates] = useState([]);
+	const [testData, setTestData] = useState([]);
 
 	// when component load
 	useEffect(() => {
 		async function getSelectedCandidates() {
-			if (state)
+			if (state) {
+				try{
 				await fetch('/get/candidates?id=' + state.join(','))
 					.then((response) => response.json())
-					.then((data) => setData(data));
+					.then((data) => {
+						setCandidates(data);
+						let selected = data.map((el) => el.can_nombre +" "+el.can_apellido);
+						setValue((prev) => {
+							return { ...prev, candidates: selected };
+						});
+					});
+
+				await fetch('/get/test?id=' + state.join(','))
+					.then((response) => response.json())
+					.then((data) => setTestData(data));
+				}catch(e) {
+					console.log(e)
+				}
+			}
 		}
 		getSelectedCandidates();
 	}, [state]);
-
 	// #region
 
-	// if state is null
-	if (!state) {
-		navigate('/');
+	if(state === null){
+		return navigate('home')
 	}
 
+
+	const aplList = [
+		...new Set(
+			testData
+				.filter((el) => (el.pr_estructura === 1 || el.pr_estructura === 2) && el.pr_status === 1)
+				.map((el) => el.pr_idCandidato)
+		)
+	].join(',');
+
+	const raziList = [
+		...new Set(testData.filter((el) => el.pr_estructura === 7 && el.pr_status === 1).map((el) => el.pr_idCandidato))
+	].join(',');
+
+	const performanceList = [
+		...new Set(
+			testData.filter(
+				(el) => el.pr_estructura !== 1 && el.pr_estructura !== 2 && el.pr_estructura !== 7 && el.pr_status === 1
+			).map((el) => el.pr_idCandidato)
+		)
+	].join(',');
+
+  const total = (parseInt(value.low) + parseInt(value.high) + parseInt(value.average));
 	// set validation
 	if (isValid.profile && value.profile !== '') setValid({ ...isValid, profile: false });
 	else if (isValid.norm && value.norm !== '') setValid({ ...isValid, norm: false });
@@ -68,6 +112,136 @@ function TestSelection() {
 
 	//#region events
 
+	// handle if axis values are same
+	const handleEqualAxis = (xAxis, data) => {
+		if (xAxis === 'razi') {
+			data
+				.flat()
+				.filter((el) => el._resultadofinal)
+				.forEach((el, i) =>
+					flushSync(() => {
+						setPosition({ ...position, x: el._resultadofinal, y: el._resultadofinal, label: i + 1, r: 10,name:candidates.map(elm=>{
+							return elm.can_id === el._idCandidato ? {can_nombre:elm.can_nombre} : '';
+						})});
+					})
+				);
+		} else if (xAxis === 'performance') {
+			let array = [];
+			let currentPosition = data.flat().find((el) => el.porcentaje);
+			array.push(currentPosition);
+			array.forEach((el, i) => {
+				flushSync(() => {
+					setPosition({ ...position, x: el.porcentaje, y: el.porcentaje, label: i + 1, r: 10,name:candidates.map(elm=>{
+						return data.flat().find(el=>el._NombreCandidato)._NombreCandidato.includes(elm.can_nombre) ? {can_nombre:elm.can_nombre} : '';
+					}) });
+				});
+			});
+		} else {
+			data
+				.flat()
+				.filter((el) => el.calceranking)
+				.forEach((el, i) => {
+					flushSync(() => {
+						setPosition({ ...position, x: el.calceranking, y: el.calceranking, label: i + 1, r: 10,name:candidates.map(elm=>{
+							return elm.can_id === data.flat().find(el=>el._idCandidato)._idCandidato ? {can_nombre:elm.can_nombre} : '';
+						})
+				});
+					});
+				});
+		}
+		chartRef.current.update();
+	};
+
+	const handlePositionData = (data, xAxis, yAxis) => {
+		let array = [];
+		let positionX, positionY;
+		if (xAxis === 'razi' && yAxis === 'apl') {
+			positionX = data[0].flat().filter((el) => el._resultadofinal);
+			positionY = data[1].flat().filter((el) => el.calceranking);
+			let obj = { ...positionX, ...positionY };
+			array.push(obj);
+			console.log(array);
+			// positionX.concat(positionY).forEach((el,i)=>flushSync(() => {
+			// 	setPosition({ ...position, x: el, y: el, label: i + 1, r: 10 });
+			// }))
+		}
+		// chartRef.current.update();
+	};
+
+	// handle if axis values are different
+	const handleNotEqualAxis = async (xAxis, yAxis) => {
+		const id = xAxis === 'apl' ? aplList : xAxis === 'performance' ? performanceList : xAxis === 'razi' ? raziList : '';
+		let xPosition, yPosition;
+		// check if test include the apl+razi
+		if (xAxis === 'apl&razi' || yAxis === 'apl&razi') {
+			xPosition =
+				xAxis === 'apl&razi'
+					? await fetch('/get/apl-razi?id=' + id)
+					: await fetch('/get/' + xAxis + '?id=' + id).then((response) => response.json());
+			yPosition =
+				yAxis === 'apl&razi'
+					? await fetch('/get/apl-razi?id=' + id)
+					: await fetch('/get/' + yAxis + '?id=' + id).then((response) => response.json());
+		} else {
+			// if another test selected
+			xPosition = await fetch('/get/' + xAxis + '?id=' + id).then((response) => response.json());
+			yPosition = await fetch('/get/' + yAxis + '?id=' + id).then((response) => response.json());
+		}
+		id !== '' &&
+			Promise.all([xPosition, yPosition]).then((data) => {
+				handlePositionData(data, xAxis, yAxis);
+			});
+	};
+
+	const handleAplAndRazi = (data)=>{
+		data.then(response=>{
+		let razi=	response[1].flat().filter((el) => el._resultadofinal);
+    let apl = response[0].flat().filter((el) => el.calceranking);
+
+		let obj = [{...apl[0],...razi[0]}];
+    
+		obj.forEach((el,i)=>{
+		flushSync(() => {
+			setPosition({ ...position, x: (el.calceranking  *(el.calceranking / 100)), y: (el._resultadofinal *(el.calceranking / 100)), label: i+1, r: 10,name:candidates.map(elm=>{
+				return elm.can_id === response[1].flat().find(el=>el._idCandidato)._idCandidato ? {can_nombre:elm.can_nombre} : '';
+			})
+
+		});
+		});
+		chartRef.current.update();
+	})
+		});
+	}
+
+	// handle position
+	const handlePosition = async (xAxis, yAxis) => {
+		const id = xAxis === 'apl' ? aplList : xAxis === 'performance' ? performanceList : xAxis === 'razi' ? raziList : xAxis === 'apl&razi' ? aplList:'' ;
+		const url = '/get/' + xAxis + '?id=' + id;
+		// if same position
+		if (xAxis === yAxis) {
+			if (xAxis === 'apl' && (value.profile === '' || value.norm === '')) {
+				handleErrors();
+			} else if (xAxis === 'apl&razi') {
+			let apl =	await fetch('/get/apl?id=' + id).then(response => response.json());
+			let razi=	await fetch('/get/razi?id=' + id).then(response=> response.json());
+			Promise.all([apl,razi]);
+			 handleAplAndRazi(Promise.all([apl,razi]))
+			} else {
+				id !== '' &&
+					(await fetch(url)
+						.then((response) => response.json())
+						.then((data) => {
+							handleEqualAxis(xAxis, data);
+						}));
+			}
+		} else if ((xAxis === 'apl' || yAxis === 'apl') && (value.profile === '' || value.norm === '')) {
+			handleErrors();
+		} else {
+			await handleNotEqualAxis(xAxis, yAxis);
+		}
+	};
+
+	// handle errors
 	const handleErrors = () => {
 		if (value.profile === '' && value.norm === '') {
 			setValid({ profile: true, norm: true });
@@ -83,40 +257,25 @@ function TestSelection() {
 			setValid({ ...isValid, chartError: true });
 		} else {
 			setValid({ ...isValid, chartError: false });
-			// if same position
-			if (xAxis === yAxis) {
-				if (xAxis === 'apl' && (value.profile === '' || value.norm === '')) {
-					handleErrors();
-				} else if (xAxis === 'apl&razi') {
-					await fetch('/get/apl-razi?id=' + data[0].can_id);
-				} else await fetch('/get/' + xAxis + '?id=' + data[0].can_id);
-			} else if ((xAxis === 'apl' || yAxis === 'apl') && (value.profile === '' || value.norm === '')) {
-				handleErrors();
-			} else {
-				let xPosition, yPosition;
-				// check if test include the apl+razi
-				if (xAxis === 'apl&razi' || yAxis === 'apl&razi') {
-					xPosition =
-						xAxis === 'apl&razi'
-							? await fetch('/get/apl-razi?id=' + data[0].can_id)
-							: await fetch('/get/' + xAxis + '?id=' + data[0].can_id);
-					yPosition =
-						yAxis === 'apl&razi'
-							? await fetch('/get/apl-razi?id=' + data[0].can_id)
-							: await fetch('/get/' + yAxis + '?id=' + data[0].can_id);
-				} else {
-					// if another test selected
-					xPosition = await fetch('/get/' + xAxis + '?id=' + data[0].can_id);
-					yPosition = await fetch('/get/' + yAxis + '?id=' + data[0].can_id);
-				}
-				Promise.all([xPosition, yPosition]).then((data) => console.log(data));
-			}
-    chartRef.current.update();
+			await handlePosition(xAxis, yAxis);
 		}
 	};
 
 	// on change input
-	const handleChange = (e) => setValue({ ...value, [e.target.name]: e.target.value });
+	const handleChange = (e) => setValue(prev=>{
+		let value = e.target.value;
+    value = value.slice(0, 3);
+    // Convert the value to a number
+    const numberValue = Number(value);
+    // Restrict the maximum value to 100
+    if (!isNaN(numberValue) && numberValue >= 100) {
+      value = '100';
+			return{ ...prev, [e.target.name]: value }
+    }else{
+		return{ ...prev, [e.target.name]: e.target.value }
+		}
+	
+	});
 	// #end region
 
 	return (
@@ -138,75 +297,53 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
 							<FormControl fullWidth>
-								<Box id="candidate" fontWeight={600} textTransform="capitalize">
-									Selected List
-								</Box>
-								<Select
-									labelId="candidate"
-									id="candidate"
-									value={value.candidate}
-									name="candidate"
-									onChange={(e) => handleChange(e)}
-									displayEmpty
-								>
-									<MenuItem value="">None</MenuItem>
-									{data.map((el) => (
-										<MenuItem key={el.can_id} value={el.can_id}>
-											{el.can_nombre + ' ' + el.can_apellido}
-										</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-						</Grid>
-						<Grid item xs={12} md={3} sm={6}>
-							<FormControl fullWidth>
-								<Box id="xAxis" fontWeight={600} textTransform="capitalize">
+								<Box id="xAxisLabel" fontWeight={600} textTransform="capitalize">
 									X Axis
 								</Box>
 								<Select
-									labelId="xAxis"
+									labelId="xAxisLabel"
 									id="xAxis"
 									value={value.xAxis}
 									name="xAxis"
 									onChange={(e) => handleChange(e)}
+									sx={{textTransform:"capitalize"}}
 									displayEmpty
 								>
 									<MenuItem value="">None</MenuItem>
-									<MenuItem value="apl">Last APL</MenuItem>
-									<MenuItem value="razi">Last RAZI</MenuItem>
-									<MenuItem value="apl&razi">Last APL + RAZI</MenuItem>
-									<MenuItem value="performance">Last Performance Evaluation</MenuItem>
+	                 {
+										axis.map(el=>	<MenuItem key={el.id} value={el.value} 	sx={{textTransform:"capitalize"}}>{el.axis}</MenuItem>)
+									 }
 								</Select>
 							</FormControl>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
 							<FormControl fullWidth>
-								<Box id="yAxis" fontWeight={600} textTransform="capitalize">
+								<Box id="yAxisLabel" fontWeight={600} textTransform="capitalize">
 									Y Axis
 								</Box>
 								<Select
-									labelId="yAxis"
+									labelId="yAxisLabel"
 									id="yAxis"
 									value={value.yAxis}
 									name="yAxis"
+									sx={{textTransform:"capitalize"}}
 									onChange={(e) => handleChange(e)}
 									displayEmpty
 								>
 									<MenuItem value="">None</MenuItem>
-									<MenuItem value="apl">Last APL</MenuItem>
-									<MenuItem value="razi">Last RAZI</MenuItem>
-									<MenuItem value="apl&razi">Last APL + RAZI</MenuItem>
-									<MenuItem value="performance">Last Performance Evaluation</MenuItem>
+	                 {
+										axis.map(el=>	<MenuItem key={el.id} value={el.value} sx={{textTransform:"capitalize"}}>{el.axis}</MenuItem>)
+									 }
 								</Select>
 							</FormControl>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
 							<FormControl fullWidth>
-								<Box id="profile" fontWeight={600} textTransform="capitalize">
+								<Box id="profileLabel" fontWeight={600} textTransform="capitalize">
 									Profile
 								</Box>
 								<Select
-									labelId="profile"
+									labelId="profileLabel"
 									id="profile"
 									value={value.profile}
 									name="profile"
@@ -228,11 +365,11 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
 							<FormControl fullWidth>
-								<Box id="norm" fontWeight={600} textTransform="capitalize">
+								<Box id="normLabel" fontWeight={600} textTransform="capitalize">
 									norm
 								</Box>
 								<Select
-									labelId="norm"
+									labelId="normLabel"
 									id="norm"
 									value={value.norm}
 									name="norm"
@@ -257,9 +394,40 @@ function TestSelection() {
 								</FormHelperText>
 							</FormControl>
 						</Grid>
+						<Grid item xs={12} marginBottom={3}>
+							<FormControl fullWidth>
+								<Box id="candidatesLabel" fontWeight={600} textTransform="capitalize">
+									Selected List
+								</Box>
+								<Select
+									multiple={true}
+									labelId="candidatesLabel"
+									onChange={(e) => setValue({ ...value, candidates: e.target.value.split(',') })}
+									id="candidate"
+									value={value.candidates}
+									name="candidate"
+									displayEmpty
+									input={<OutlinedInput />}
+									inputProps={{ 'aria-label': 'Without label' }}
+									renderValue={(selected) => {
+										if (selected.length === 0) {
+											return <em>None</em>;
+										}
+
+										return selected.join(', ');
+									}}
+								>
+									{candidates.map((el) => (
+										<MenuItem disabled={true} key={el.can_id} value={el.can_id}>
+											{el.can_nombre + ' ' + el.can_apellido}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						</Grid>
 						<Grid item xs={12}>
 							<Typography variant="h5" fontWeight={600}>
-								Chart Config
+								Chart Settings
 							</Typography>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
@@ -267,7 +435,14 @@ function TestSelection() {
 								<Box component={'label'} fontWeight={600} textTransform="capitalize" display={'block'} htmlFor="low">
 									Low
 								</Box>
-								<TextField id="low" type="number" name="low" value={value.low} onChange={(e) => handleChange(e)} />
+								<TextField
+									id="low"
+									inputProps={{ min: 0, max: 100, step: 5 }}
+									type="number"
+									name="low"
+									value={value.low}
+									onChange={(e) => handleChange(e)}
+								/>
 							</FormControl>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
@@ -286,6 +461,7 @@ function TestSelection() {
 									type="number"
 									name="average"
 									value={value.average}
+									inputProps={{ min: 0, max: 100, step: 5 }}
 									onChange={(e) => handleChange(e)}
 								/>
 							</FormControl>
@@ -295,13 +471,20 @@ function TestSelection() {
 								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="high">
 									High
 								</Box>
-								<TextField id="high" type="number" name="high" value={value.high} onChange={(e) => handleChange(e)} />
+								<TextField
+									id="high"
+									inputProps={{ min: 0, max: 100, step: 5 }}
+									type="number"
+									name="high"
+									value={value.high}
+									onChange={(e) => handleChange(e)}
+								/>
 							</FormControl>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6}>
 							<FormControl fullWidth>
 								<Box id="chartView" fontWeight={600} textTransform="capitalize">
-									Chart View
+									bars
 								</Box>
 								<Select
 									labelId="chartView"
@@ -317,24 +500,24 @@ function TestSelection() {
 							</FormControl>
 						</Grid>
 						{isValid.chartError && (
-							<Grid item xs={12}>
-								<Alert variant="outlined" severity="warning">
-									The total of low, average, high should be equal to 100. Current total is{' '}
-									{parseInt(value.low) + parseInt(value.high) + parseInt(value.average)}.
+							<Grid item xs={12} sx={{ mt: 4 }}>
+								<Alert variant="outlined" severity={total !== 100 ?"warning":"success"}>
+									The total of low, average, high should be equal to 100. Current total is 
+									  <Box component={"span"} fontWeight={"600"}> {total}</Box>.
 								</Alert>
 							</Grid>
 						)}
-						<Grid item xs={12} textAlign="right">
+						<Grid item xs={12} textAlign="right" sx={{ my: 4 }}>
 							<Button
 								variant="contained"
 								disabled={isValid.profile || isValid.norm}
-								onClick={() => getPosition(value.xAxis, value.yAxis)}
+								onClick={(e) => getPosition(value.xAxis, value.yAxis)}
 							>
 								Generate
 							</Button>
 						</Grid>
 					</Grid>
-					<BarChart value={value} ref={chartRef}/>
+					<BarChart value={value} ref={chartRef} bubblePosition={position} />
 					{/* grid */}
 				</Container>
 			</Box>

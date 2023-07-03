@@ -9,7 +9,7 @@ function FormSelect({ value, name, handleChange,title,data, children }) {
 	
 	return (
 		<FormControl fullWidth>
-			<Box id={name} fontWeight={600} textTransform="capitalize">
+			<Box id={name+"Label"} fontWeight={600} textTransform="capitalize">
 				{title}
 			</Box>
 			<Select labelId={name} id={name} value={value} name={name} onChange={(e) => handleChange(e)} displayEmpty>
