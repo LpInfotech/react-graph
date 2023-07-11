@@ -15,6 +15,7 @@ import Alert from '@mui/material/Alert';
 import { flushSync } from 'react-dom';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { axis } from '../../config';
+import ChartLayout from '../../components/ChartLayout/ChartLayout';
 
 function TestSelection() {
 	const routeData = useLoaderData();
@@ -165,7 +166,7 @@ function TestSelection() {
 			});
 			setPrint(true);
 			horizontalChartRef.current.update();
-			verticalChartRef.current.update();
+			// verticalChartRef.current.update();
 		} else if (xAxis === 'performance') {
 			let array = [];
 			let currentPosition = data.flat().find((el) => el.porcentaje);
@@ -233,7 +234,7 @@ function TestSelection() {
 
 			setPrint(true);
 			horizontalChartRef.current.update();
-			verticalChartRef.current.update();
+			// verticalChartRef.current.update();
 		}
 	};
 
@@ -337,7 +338,7 @@ function TestSelection() {
 			}
 		}
 		horizontalChartRef.current.update();
-		verticalChartRef.current.update();
+		// verticalChartRef.current.update();
 	};
 
 	// handle if axis values are different
@@ -436,7 +437,7 @@ function TestSelection() {
 				});
 				setPrint(true);
 				horizontalChartRef.current.update();
-				verticalChartRef.current.update();
+				// verticalChartRef.current.update();
 			})
 			.catch((e) => setPrint(false));
 	};
@@ -847,7 +848,7 @@ function TestSelection() {
 									sx={{ ml: 5 }}
 									onClick={() => {
 										horizontalChartRef.current.print();
-										verticalChartRef.current.print();
+										// verticalChartRef.current.print();
 										setTimeout(() => window.print(), 200);
 									}}
 								>
@@ -855,12 +856,12 @@ function TestSelection() {
 								</Button>
 							)}
 						</Grid>
-						<Grid item xl={6}>
+						<Grid item xl={12}>
 							<BarChart value={value} colors={colors} ref={horizontalChartRef} view="x" bubblePosition={position} />
 						</Grid>
-						<Grid item xl={6}>
+						{/* <Grid item xl={12}>
 							<BarChart value={value} colors={colors} ref={verticalChartRef} view="y" bubblePosition={position} />
-						</Grid>
+						</Grid> */}
 					</Grid>
 
 					{/* grid */}
