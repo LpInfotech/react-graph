@@ -11,11 +11,11 @@ module.exports={
     plugins: {
       datalabels: {
         font: {
-          size: 16.5,
-          weight: 600
+          size: 15,
+          weight: 300
         },
         color: (context, args) => {
-          return ['#3e2723', '#01579b', '#1b5e20'];
+          return '#fff';
         }
       },
       legend: {
@@ -28,18 +28,17 @@ module.exports={
         // filter: (tooltipItem) => tooltipItem.datasetIndex === 0,
         callbacks: {
           label: (tooltipItems) => {
-            return (tooltipItems.raw?.label + " " + tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
+            return (tooltipItems.raw?.label+". " + tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
           }
         }
       }
     },
     scales: {
-  
       x: {
         title: { display: false, text: '9 Box' },
         beginAtZero: true,
         min:0,
-        max:100.95,
+        max:101,
         grid: {
           display: false,
           drawOnChartArea:false,

@@ -2,11 +2,10 @@ import React, { forwardRef, useImperativeHandle, useRef, useState,memo } from 'r
 import { chartConfig } from '../../config';
 import { styled } from '@mui/system';
 import Box from '@mui/material/Box';
-
 import { Chart as ChartJS, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Bubble } from 'react-chartjs-2';
-import { flushSync } from 'react-dom';
+import { orange,red,yellow } from '@mui/material/colors';
 
 // register controller
 ChartJS.register(LinearScale, PointElement, Legend, Tooltip, ChartDataLabels);
@@ -24,11 +23,9 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 		],
 	};
   
-	const [chartDimensions, setChartDimensions] = useState({height:null,width:null});
 	const [data, setData] = useState(initialData);
 	const chartRef = useRef(null);
 
-console.log('render')
 	useImperativeHandle(ref, () => {
 		return {
 			update() {
@@ -39,7 +36,7 @@ console.log('render')
 				triggerHover(chartRef.current);
 			},
 			resize(){
-				chartRef?.current.resize(700,700);
+				chartRef?.current.resize(750,750);
 			}
 		};
 	});
@@ -47,7 +44,7 @@ console.log('render')
 	// before print
 	window.addEventListener('beforeprint', () => {
 		if (chartRef.current !== null) {
-			chartRef?.current.resize(700,700);
+			chartRef?.current.resize(750,750);
 		}
 	});
 
@@ -87,6 +84,9 @@ console.log('render')
 					mx: 'auto',
 				  width:'100%',
 					height: '100%',
+					'@media print and (min-width: 320px)': {
+           marginTop: '80px'
+         }
 				}}
 			>
 				<Box
@@ -94,12 +94,11 @@ console.log('render')
 					sx={{
 						gridTemplateColumns: `${parseInt(value.xLow) + '%'} ${parseInt(value.xAverage) + '%'} ${
 							parseInt(value.xHigh) + '%'
-						}`,width: '100%',
+						}`,width: '100%',overflow:'hidden'
 					}}
 				>
 					<Box>
 						<Div
-							className="low"
 							sx={{
 								width: parseInt(value.xLow) + '%',
 								height: parseInt(value.yLow) + '%',
@@ -111,20 +110,21 @@ console.log('render')
 									position:'absolute',
 									top:'50%',
 									left: 10,
-								}
+								},
+								backgroundColor:red[300],
 							}}
 						>
 							Low
 						</Div>
 						<Div
-							className="average"
 							sx={{
 								width: parseInt(value.xLow) + parseInt(value.xAverage) + '%',
 								height: parseInt(value.yAverage) + '%',
 								bottom: parseInt(value.yLow) + '%',
 								zIndex: 1,
 								alignItems: 'center',
-								pl: 1
+								pl: 1,
+								backgroundColor:orange.A200,
 							}}
 						>
 							Average
@@ -136,22 +136,22 @@ console.log('render')
 								height: parseInt(value.yHigh) + '%',
 								zIndex: 1,
 								alignItems: 'center',
-								pl: 1
+								pl: 1,
+								backgroundColor:yellow.A100,
 							}}
-							className="high"
 						>
 							High
 						</Div>
 					</Box>
 					<Box>
 						<Div
-							className="average"
 							sx={{
 								width: parseInt(value.xAverage) + '%',
 								justifyContent: 'center',
 								alignItems: 'flex-end',
 								bottom: 0,
-								height: '100%'
+								height: '100%',
+								backgroundColor:orange.A200,
 							}}
 						>
 							Average
@@ -159,13 +159,13 @@ console.log('render')
 					</Box>
 					<Box>
 						<Div
-							className="high"
 							sx={{
 								width: parseInt(value.xHigh) + '%',
 								justifyContent: 'center',
 								alignItems: 'flex-end',
 								bottom: 0,
-								height: '100%'
+								height: '100%',
+								backgroundColor:yellow.A100,
 							}}
 						>
 							High

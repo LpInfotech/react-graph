@@ -512,11 +512,13 @@ function TestSelection() {
 		}
 	};
 
+	// region set label colors
+	let labelColors =['#455a64','#424242','#5d4037']
 	let colors = position.map((el, i) => {
-		return `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(
-			Math.random() * 256
-		)},0.69)`;
+		let newColor = Math.floor(Math.random() * labelColors.length);
+		return labelColors[newColor];
 	});
+	//#end region 
 
 	// on change input
 	const handleChange = (e) =>

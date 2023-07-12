@@ -3,20 +3,6 @@ canvas{
   z-index: 11;
 }
 
-.high{
-  background-color:rgb(178, 255, 178);
-}
-
-.low{
-  background-color:rgb(251, 141, 141);
-  text-align: center;
-}
-
-.average{
-  background-color:rgb(255, 204, 108);
-  text-align: center;
-}
-
 html > canvas{
   visibility: hidden !important;
 }
