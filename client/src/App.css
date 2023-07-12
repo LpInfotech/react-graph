@@ -1,42 +1,6 @@
-.wrapper {
-	display: grid;
-	width: 100%;
-	overflow: hidden;
-}
-
-/* .wrapper div div:nth-child(odd) {
-	background-color: #458ac648;
-}
-
-.wrapper div div:nth-child(even) {
-	background-color: rgba(122, 122, 122, 0);
-} */
-
-.wrapper div div {
-	position: absolute;
-  width: inherit;
-}
-
 canvas{
   position:relative;
   z-index: 11;
-  /* top:0;
-  left: 0;
-  z-index: 99999; */
-}
-
-
-.wrapper > div div:first-child {
-	bottom: 0;
-}
-
-.wrapper > div:nth-child(2) div:first-child {
-	height: 100%;
-}
-
-
-.wrapper > div:nth-child(3) div:last-child {
-	height: 100%;
 }
 
 .high{
@@ -45,12 +9,13 @@ canvas{
 
 .low{
   background-color:rgb(251, 141, 141);
+  text-align: center;
 }
 
 .average{
   background-color:rgb(255, 204, 108);
+  text-align: center;
 }
-
 
 html > canvas{
   visibility: hidden !important;

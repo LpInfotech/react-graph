@@ -1,104 +1,17 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState,memo } from 'react';
+import { chartConfig } from '../../config';
+import { styled } from '@mui/system';
+import Box from '@mui/material/Box';
 
-import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Chart as ChartJS, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { Chart } from 'react-chartjs-2';
+import { Bubble } from 'react-chartjs-2';
+import { flushSync } from 'react-dom';
 
 // register controller
-ChartJS.register(
-	LinearScale,
-	PointElement,
-	Legend,
-	Tooltip,
-	ChartDataLabels,
-);
+ChartJS.register(LinearScale, PointElement, Legend, Tooltip, ChartDataLabels);
 
-// chart config
-const config = {
-  maintainAspectRatio: true,
-	responsive: true,
-	interaction: {
-		mode: 'nearest'
-	},
-	plugins: {
-		datalabels: {
-			font: {
-				size: 16.5,
-				weight: 600
-			},
-			color: (context, args) => {
-				return ['#3e2723', '#01579b', '#1b5e20'];
-			}
-		},
-		legend: {
-			display: false
-		},
-		title: {
-			display: true
-		},
-		tooltip: {
-			// filter: (tooltipItem) => tooltipItem.datasetIndex === 0,
-			callbacks: {
-				label: (tooltipItems) => {
-					return (tooltipItems.raw?.label + " " + tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
-				}
-			}
-		}
-	},
-	scales: {
-
-		x: {
-			title: { display: false, text: '9 Box' },
-			beginAtZero: true,
-			min:0,
-			max:101,
-			grid: {
-				display: false,
-				drawOnChartArea:false,
-				drawBorder:false,
-				drawTicks:false,
-				lineWidth:0,
-				textStrokeWidth:0
-			},
-			ticks: {
-				display: false
-			},
-			border:{
-				display:false,
-			 },
-		},
-		y: {
-			beginAtZero: true,
-			title: { display: false, text: '9 Box' },
-			min:0,
-			max:101,
-			grid: {
-				display: false,
-				drawOnChartArea:false,
-				drawBorder:false,
-				drawTicks:false,
-				lineWidth:0,
-				textStrokeWidth:0
-			},
-			border:{
-			 display:false,
-			},
-			ticks: {
-				display: false
-			}
-		}
-	}
-};
-
-const BarChart = forwardRef(function BarChart({ values, bubblePosition, view, colors }, ref) {
-	const [options, setOptions] = useState(config);
-
+const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colors}, ref) {
 	const initialData = {
 		datasets: [
 			{
@@ -107,89 +20,41 @@ const BarChart = forwardRef(function BarChart({ values, bubblePosition, view, co
 				borderWidth: 1,
 				fill: false,
 				data: bubblePosition
-			},
-			// {
-			// 	type: 'bar',
-			// 	label: 'Low',
-			// 	backgroundColor: 'rgba(255,0,0,0.4)',
-			// 	data: [{ x: view === 'y' ? value.verticalLow : 0, y: view === 'x' ? value.horizontalLow : 0, label: 'Low' }]
-			// },
-			// {
-			// 	type: 'bar',
-			// 	label: 'Average',
-			// 	backgroundColor: 'rgba(255,255,0,0.4)',
-			// 	data: [
-			// 		{
-			// 			x: view === 'y' ? value.verticalAverage : 0,
-			// 			y: view === 'x' ? value.horizontalAverage : 0,
-			// 			label: 'Average'
-			// 		}
-			// 	],
-			// 	options: {
-			// 		tooltip: {
-			// 			enabled: false
-			// 		}
-			// 	}
-			// },
-			// {
-			// 	type: 'bar',
-			// 	label: 'High',
-			// 	backgroundColor: 'rgba(0,128,0,0.4)',
-			// 	data: [{ x: view === 'y' ? value.verticalHigh : 0, y: view === 'x' ? value.horizontalHigh : 0, label: 'High' }],
-			// 	options: {
-			// 		tooltips: {
-			// 			enabled: false
-			// 		}
-			// 	}
-			// }
-		]
+			}
+		],
 	};
-
+  
+	const [chartDimensions, setChartDimensions] = useState({height:null,width:null});
 	const [data, setData] = useState(initialData);
 	const chartRef = useRef(null);
 
-	const [value,setValue] = useState({
-    xLow:30,
-    xAverage:30,
-    xHigh:40,
-    yLow:50,
-    yAverage:30,
-    yHigh:20  
-  })
-
-const handleChange = (e) => {
-  setValue({...value,[e.target.name]:e.target.value})
-}
-
+console.log('render')
 	useImperativeHandle(ref, () => {
 		return {
 			update() {
-				setData(initialData);
+       setData(initialData);
 				chartRef.current.update();
 			},
-			print(){
-					triggerHover(chartRef.current)
+			print() {
+				triggerHover(chartRef.current);
+			},
+			resize(){
+				chartRef?.current.resize(700,700);
 			}
 		};
 	});
 
-	// chart ref update index
-	// if (view !== options.indexAxis && chartRef.current) {
-	// 	setOptions({ ...options, indexAxis: view });
-	// 	chartRef.current.update();
-	// }
-
-// before print 
+	// before print
 	window.addEventListener('beforeprint', () => {
 		if (chartRef.current !== null) {
-			chartRef.current.resize(800, 1200);
+			chartRef?.current.resize(700,700);
 		}
 	});
 
-	// after print 
+	// after print
 	window.addEventListener('afterprint', () => {
 		if (chartRef.current !== null) {
-			chartRef.current.resize();
+			chartRef?.current.resize();
 		}
 	});
 
@@ -208,39 +73,109 @@ const handleChange = (e) => {
 		chart.update();
 	}
 
-
-	console.log(chartRef?.current,)
-
+	const Div = styled('div')(({ theme }) => ({
+		position: 'absolute',
+		display: 'flex'
+	}));
 
 	return (
 		<>
-		<div style={{marginBottom:'32px',display:'flex',alignItems: 'center',justifyContent: 'space-between',flexWrap:'wrap'}}>
-		<input type="text" name="xLow" onChange={(e)=>handleChange(e)} placeholder="xLow" value={value.xLow} />
-		<input type="text" name="xAverage" onChange={(e)=>handleChange(e)} placeholder="xAverage" value={value.xAverage} />
-		<input type="text" name="xHigh" onChange={(e)=>handleChange(e)} placeholder="xHigh" value={value.xHigh} />
-		<input type="text" name="yLow" onChange={(e)=>handleChange(e)} placeholder='yLow' value={value.yLow}/>
-		<input type="text" name="yAverage" onChange={(e)=>handleChange(e)} placeholder='yAverage' value={value.yAverage}/>
-		<input type="text" name="yHigh" onChange={(e)=>handleChange(e)} placeholder='yHigh' value={value.yHigh}/>
-		</div>
-
-		<div style={{position:'relative',overflow:'hidden',marginInline:'auto',minWidth:chartRef?.current?.chartArea?.width,minHeight:chartRef?.current?.chartArea.height,width:window.innerWidth - 80 +"px"}}>
-		<div className="wrapper" style={{gridTemplateColumns:`${value.xLow + "%"} ${value.xAverage+ "%"} ${value.xHigh+ "%"}`}}>
-		<div>
-			<div className='low' style={{width:parseInt(value.xLow) + "%",height:parseInt(value.yLow) + "%",bottom:'0px'}}>1</div>
-			<div className='average' style={{bottom:parseInt(value.yLow)+"%",	width:parseInt(value.xLow)+parseInt(value.xAverage) + "%",zIndex:1,height:parseInt(value.yAverage)+"%"}}>2</div>
-			<div style={{bottom:parseInt(value.yAverage)+parseInt(value.yLow)+"%",width:parseInt(value.xLow)+parseInt(value.xAverage) + "%",zIndex:1,height:parseInt(value.yHigh)+"%"}} className='high'>3</div>
-			</div>
-			<div>
-			<div className='average' style={{width:parseInt(value.xAverage)+"%"}}>4</div>
-			</div>
-			<div>
-			<div className='high' style={{width:parseInt(value.xHigh)+"%"}}>7</div>
-			</div>
-		</div>
-		<Chart ref={chartRef}  type="bubble" options={options} data={data} />
-		</div>
-		</>)
-
-});
+			<Box
+				position={'relative'}
+				overflow={'hidden'}
+				sx={{
+					mx: 'auto',
+				  width:'100%',
+					height: '100%',
+				}}
+			>
+				<Box
+					display={'grid'}
+					sx={{
+						gridTemplateColumns: `${parseInt(value.xLow) + '%'} ${parseInt(value.xAverage) + '%'} ${
+							parseInt(value.xHigh) + '%'
+						}`,width: '100%',
+					}}
+				>
+					<Box>
+						<Div
+							className="low"
+							sx={{
+								width: parseInt(value.xLow) + '%',
+								height: parseInt(value.yLow) + '%',
+								bottom: 0,
+								justifyContent: 'center',
+								alignItems: 'flex-end',
+								'&.low::before': {
+									content: '"Low"',
+									position:'absolute',
+									top:'50%',
+									left: 10,
+								}
+							}}
+						>
+							Low
+						</Div>
+						<Div
+							className="average"
+							sx={{
+								width: parseInt(value.xLow) + parseInt(value.xAverage) + '%',
+								height: parseInt(value.yAverage) + '%',
+								bottom: parseInt(value.yLow) + '%',
+								zIndex: 1,
+								alignItems: 'center',
+								pl: 1
+							}}
+						>
+							Average
+						</Div>
+						<Div
+							bottom={parseInt(value.yAverage) + parseInt(value.yLow) + '%'}
+							sx={{
+								width: parseInt(value.xLow) + parseInt(value.xAverage) + '%',
+								height: parseInt(value.yHigh) + '%',
+								zIndex: 1,
+								alignItems: 'center',
+								pl: 1
+							}}
+							className="high"
+						>
+							High
+						</Div>
+					</Box>
+					<Box>
+						<Div
+							className="average"
+							sx={{
+								width: parseInt(value.xAverage) + '%',
+								justifyContent: 'center',
+								alignItems: 'flex-end',
+								bottom: 0,
+								height: '100%'
+							}}
+						>
+							Average
+						</Div>
+					</Box>
+					<Box>
+						<Div
+							className="high"
+							sx={{
+								width: parseInt(value.xHigh) + '%',
+								justifyContent: 'center',
+								alignItems: 'flex-end',
+								bottom: 0,
+								height: '100%'
+							}}
+						>
+							High
+						</Div>
+					</Box>
+				</Box>
+				<Bubble ref={chartRef} options={chartConfig} data={data} />
+			</Box>
+		</>
+	);
+}));
 
 export default BarChart;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Container from '@mui/material/Container';
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
@@ -15,14 +15,13 @@ import Alert from '@mui/material/Alert';
 import { flushSync } from 'react-dom';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { axis } from '../../config';
-import ChartLayout from '../../components/ChartLayout/ChartLayout';
+
 
 function TestSelection() {
 	const routeData = useLoaderData();
 	const navigate = useNavigate();
 	const { state } = useLocation();
-	const horizontalChartRef = useRef(null);
-	const verticalChartRef = useRef(null);
+	const chartRef = useRef(null);
 	const [isPrint, setPrint] = useState(false);
 
 	const [value, setValue] = useState({
@@ -31,12 +30,12 @@ function TestSelection() {
 		profile: '',
 		norm: '',
 		candidates: [],
-		horizontalLow: 25,
-		horizontalAverage: 25,
-		horizontalHigh: 50,
-		verticalLow: 25,
-		verticalAverage: 25,
-		verticalHigh: 50
+		xLow: 25,
+		xAverage: 25,
+		xHigh: 50,
+		yLow: 25,
+		yAverage: 25,
+		yHigh: 50,
 	});
 
 	const [position, setPosition] = useState([]);
@@ -49,6 +48,7 @@ function TestSelection() {
 		verticalChartError: false
 	});
 
+  const [isGenerated, setGenerated] = useState(false);
 	const [candidates, setCandidates] = useState([]);
 	const [testData, setTestData] = useState([]);
 
@@ -78,6 +78,9 @@ function TestSelection() {
 		getSelectedCandidates();
 	}, [state]);
 	// #region
+
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const Chart = useCallback(()=> <BarChart value={value} colors={colors} ref={chartRef} bubblePosition={position} />,[isGenerated]);
 
 	if (state === null) {
 		return navigate('/');
@@ -113,8 +116,8 @@ function TestSelection() {
 	].join(',');
 
 	const horizontalTotal =
-		parseInt(value.horizontalLow) + parseInt(value.horizontalAverage) + parseInt(value.horizontalHigh);
-	const verticalTotal = parseInt(value.verticalLow) + parseInt(value.verticalAverage) + parseInt(value.verticalHigh);
+		parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh);
+	const verticalTotal = parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh);
 
 	// set validation
 	if (isValid.profile && value.profile !== '') setValid({ ...isValid, profile: false });
@@ -165,8 +168,7 @@ function TestSelection() {
 				setPosition(raziData);
 			});
 			setPrint(true);
-			horizontalChartRef.current.update();
-			// verticalChartRef.current.update();
+			chartRef.current.update();
 		} else if (xAxis === 'performance') {
 			let array = [];
 			let currentPosition = data.flat().find((el) => el.porcentaje);
@@ -233,9 +235,9 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-			horizontalChartRef.current.update();
-			// verticalChartRef.current.update();
+			chartRef.current.update();
 		}
+		setGenerated((prev)=> !prev);
 	};
 
 	const handlePositionData = (data, xAxis, yAxis) => {
@@ -337,8 +339,8 @@ function TestSelection() {
 				);
 			}
 		}
-		horizontalChartRef.current.update();
-		// verticalChartRef.current.update();
+		chartRef.current.update();
+		setGenerated((prev)=> !prev);
 	};
 
 	// handle if axis values are different
@@ -436,8 +438,8 @@ function TestSelection() {
 					setPosition(array);
 				});
 				setPrint(true);
-				horizontalChartRef.current.update();
-				// verticalChartRef.current.update();
+				setGenerated((prev)=> !prev);
+				chartRef.current.update();
 			})
 			.catch((e) => setPrint(false));
 	};
@@ -497,9 +499,9 @@ function TestSelection() {
 
 	const getPosition = async (xAxis, yAxis) => {
 		const horizontalTotal =
-			parseInt(value.horizontalLow) + parseInt(value.horizontalAverage) + parseInt(value.horizontalHigh) !== 100;
+			parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh) !== 100;
 		const verticalTotal =
-			parseInt(value.verticalLow) + parseInt(value.verticalAverage) + parseInt(value.verticalHigh) !== 100;
+			parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh) !== 100;
 		if (horizontalTotal) {
 			setValid({ ...isValid, horizontalChartError: true });
 		} else if (verticalTotal) {
@@ -532,6 +534,7 @@ function TestSelection() {
 			}
 		});
 	// #end region
+
 	return (
 		<>
 			{/* filter section */}
@@ -695,16 +698,16 @@ function TestSelection() {
 									fontWeight={600}
 									textTransform="capitalize"
 									display={'block'}
-									htmlFor="horizontalLow"
+									htmlFor="xLow"
 								>
 									Horizontal Low
 								</Box>
 								<TextField
-									id="horizontalLow"
+									id="xLow"
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									type="number"
-									name="horizontalLow"
-									value={value.horizontalLow}
+									name="xLow"
+									value={value.xLow}
 									onChange={(e) => handleChange(e)}
 								/>
 							</FormControl>
@@ -716,15 +719,15 @@ function TestSelection() {
 									fontWeight={600}
 									textTransform="capitalize"
 									display={'block'}
-									htmlFor="horizontalAverage"
+									htmlFor="xAverage"
 								>
 									Horizontal Average
 								</Box>
 								<TextField
-									id="horizontalAverage"
+									id="xAverage"
 									type="number"
-									name="horizontalAverage"
-									value={value.horizontalAverage}
+									name="xAverage"
+									value={value.xAverage}
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									onChange={(e) => handleChange(e)}
 								/>
@@ -737,16 +740,16 @@ function TestSelection() {
 									display={'block'}
 									fontWeight={600}
 									textTransform="capitalize"
-									htmlFor="horizontalHigh"
+									htmlFor="xHigh"
 								>
 									Horizontal High
 								</Box>
 								<TextField
-									id="horizontalHigh"
+									id="xHigh"
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									type="number"
-									name="horizontalHigh"
-									value={value.horizontalHigh}
+									name="xHigh"
+									value={value.xHigh}
 									onChange={(e) => handleChange(e)}
 								/>
 							</FormControl>
@@ -758,16 +761,16 @@ function TestSelection() {
 									fontWeight={600}
 									textTransform="capitalize"
 									display={'block'}
-									htmlFor="verticalLow"
+									htmlFor="yLow"
 								>
 									Vertical Low
 								</Box>
 								<TextField
-									id="verticalLow"
+									id="yLow"
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									type="number"
-									name="verticalLow"
-									value={value.verticalLow}
+									name="yLow"
+									value={value.yLow}
 									onChange={(e) => handleChange(e)}
 								/>
 							</FormControl>
@@ -779,15 +782,15 @@ function TestSelection() {
 									fontWeight={600}
 									textTransform="capitalize"
 									display={'block'}
-									htmlFor="verticalAverage"
+									htmlFor="yAverage"
 								>
 									Vertical Average
 								</Box>
 								<TextField
-									id="verticalAverage"
+									id="yAverage"
 									type="number"
-									name="verticalAverage"
-									value={value.verticalAverage}
+									name="yAverage"
+									value={value.yAverage}
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									onChange={(e) => handleChange(e)}
 								/>
@@ -800,16 +803,16 @@ function TestSelection() {
 									display={'block'}
 									fontWeight={600}
 									textTransform="capitalize"
-									htmlFor="verticalHigh"
+									htmlFor="yHigh"
 								>
 									Vertical High
 								</Box>
 								<TextField
-									id="verticalHigh"
+									id="yHigh"
 									inputProps={{ min: 0, max: 100, step: 5 }}
 									type="number"
-									name="verticalHigh"
-									value={value.verticalHigh}
+									name="yHigh"
+									value={value.yHigh}
 									onChange={(e) => handleChange(e)}
 								/>
 							</FormControl>
@@ -847,9 +850,10 @@ function TestSelection() {
 									variant="contained"
 									sx={{ ml: 5 }}
 									onClick={() => {
-										horizontalChartRef.current.print();
-										// verticalChartRef.current.print();
-										setTimeout(() => window.print(), 200);
+										flushSync(()=>	{chartRef.current.resize();
+											chartRef.current.print();
+										});
+									setTimeout(()=>window.print(),200)
 									}}
 								>
 									Print
@@ -857,11 +861,8 @@ function TestSelection() {
 							)}
 						</Grid>
 						<Grid item xl={12}>
-							<BarChart value={value} colors={colors} ref={horizontalChartRef} view="x" bubblePosition={position} />
+						<Chart/>
 						</Grid>
-						{/* <Grid item xl={12}>
-							<BarChart value={value} colors={colors} ref={verticalChartRef} view="y" bubblePosition={position} />
-						</Grid> */}
 					</Grid>
 
 					{/* grid */}
