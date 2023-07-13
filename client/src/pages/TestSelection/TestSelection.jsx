@@ -839,7 +839,21 @@ function TestSelection() {
 								</Button>
 							)}
 						</Grid>
-						<Grid item xl={12} sx={{ mb: 10, mt: 4 }}>
+						<Grid
+							item
+							xl={12}
+							sx={{
+								mb: 10,
+								mt: 4,
+								flexGrow: 1,
+								'@media print and (min-width: 320px)': {
+									flexGrow: 0
+								},
+								'@media screen and (max-width: 320px)': {
+									flexGrow: 0
+								}
+							}}
+						>
 							<Chart />
 						</Grid>
 					</Grid>

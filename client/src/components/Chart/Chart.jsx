@@ -38,7 +38,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 				triggerHover(chartRef.current);
 			},
 			resize(){
-				chartRef?.current.resize(770,770);
+				chartRef?.current.resize(750,760);
 			}
 		};
 	});
@@ -46,7 +46,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 	// before print
 	window.addEventListener('beforeprint', () => {
 		if (chartRef.current !== null) {
-			chartRef?.current.resize(770,770);
+			chartRef?.current.resize(750,760);
 		}
 	});
 
@@ -95,8 +95,12 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 					mx: 'auto',
 				  width:'100%',
 					height: '100%',
+					'@media screen and (max-width:576px)':{
+						fontSize:'13px'
+					},
 					'@media print and (min-width: 320px)': {
-           marginTop: '80px'
+           marginTop: '80px',
+					 fontSize:'14px'
          }
 				}}
 			>
@@ -114,13 +118,11 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 								width: parseInt(value.xLow) + '%',
 								height: parseInt(value.yLow) + '%',
 								bottom: 0,
-								justifyContent: 'center',
-								alignItems: 'flex-end',
+								justifyContent: 'flex-start',
+								alignItems: 'center',
 								'&::before': {
 									content: '"Low"',
-									position:'absolute',
-									top:'50%',
-									left: 10,
+									pl:1,
 									display:parseInt(value.yLow) === 0 ? 'none' : ''
 								},
 								backgroundColor:red[300],

@@ -8,6 +8,9 @@ module.exports = {
     interaction: {
       mode: 'nearest'
     },
+    layout: {
+      autoPadding: false,
+    },
     plugins: {
       datalabels: {
         font: {
@@ -37,7 +40,7 @@ module.exports = {
         title: { display: false, },
         beginAtZero: true,
         min: 0,
-        max: 100.7,
+        max: 101,
         grid: {
           display: false,
           drawOnChartArea: false,
