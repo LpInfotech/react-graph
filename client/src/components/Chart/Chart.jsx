@@ -86,9 +86,6 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 	return (
 		<>
 		<Stack>
-		<Box>
-			
-		</Box>
 			<Box
 				position={'relative'}
 				sx={{
@@ -120,6 +117,8 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 								bottom: 0,
 								justifyContent: 'flex-start',
 								alignItems: 'center',
+								zIndex:parseInt(value.xLow) === 0 ? 1 : '',
+								left:parseInt(value.xLow) === 0 ? '-20px' : '',
 								'&::before': {
 									content: '"Low"',
 									pl:1,
@@ -182,7 +181,6 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 					</Box>
 				</Box>
 				<Bubble ref={chartRef} options={chartConfig} data={data} />
-
 				<Stack position={'absolute'} flexDirection={'row'} width={'100%'}>
 					<Item sx={{flexBasis:value.xLow+"%",display:parseInt(value.xLow) === 0 ? 'none' : ''}}>Low</Item>
 					<Item sx={{flexBasis:value.xAverage+"%",display:parseInt(value.xAverage) === 0 ? 'none' : ''}}>Average</Item>
