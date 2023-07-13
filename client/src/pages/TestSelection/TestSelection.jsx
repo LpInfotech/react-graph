@@ -809,12 +809,12 @@ function TestSelection() {
 									{!isNaN(horizontalTotal)? <>Current total for the horizontal axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{horizontalTotal}
-									</Box></>:<>Horizontal axis :-<Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}>All fields should be filled.</Box></>}
+									</Box></>:<>Horizontal axis :- <Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}> All fields should be filled.</Box></>}
 									<br />
 									{!isNaN(verticalTotal) ? <>Current total for the vertical axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{verticalTotal}
-									</Box></>:<>Vertical axis :-<Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}>All fields should be filled.</Box></>}
+									</Box></>:<>Vertical axis :- <Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}> All fields should be filled.</Box></>}
 								</Alert>
 							</Grid>
 						)}
