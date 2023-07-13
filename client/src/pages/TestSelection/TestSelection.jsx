@@ -118,8 +118,8 @@ function TestSelection() {
 		)
 	].join(',');
 
-	const horizontalTotal = parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh);
-	const verticalTotal = parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh);
+	const horizontalTotal = Number(value.xLow) + Number(value.xAverage) + Number(value.xHigh);
+	const verticalTotal = Number(value.yLow) + Number(value.yAverage) + Number(value.yHigh);
 
 	// set validation
 	if (isValid.profile && value.profile !== '') setValid({ ...isValid, profile: false });
@@ -500,11 +500,12 @@ function TestSelection() {
 	};
 
 	const getPosition = async (xAxis, yAxis) => {
-		const horizontalTotal = parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh) !== 100;
-		const verticalTotal = parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh) !== 100;
-		if (horizontalTotal) {
+		debugger;
+		const isHorizontalTotal = horizontalTotal !== 100;
+		const isVerticalTotal = verticalTotal !== 100;
+		if (isHorizontalTotal) {
 			setValid({ ...isValid, horizontalChartError: true });
-		} else if (verticalTotal) {
+		} else if (isVerticalTotal) {
 			setValid({ ...isValid, verticalChartError: true });
 		} else {
 			setValid({ ...isValid, horizontalChartError: false, verticalChartError: false });
