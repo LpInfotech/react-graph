@@ -6,11 +6,13 @@ import { Chart as ChartJS, LinearScale, PointElement, Tooltip, Legend } from 'ch
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Bubble } from 'react-chartjs-2';
 import { orange,red,yellow } from '@mui/material/colors';
+import { Stack } from '@mui/material';
 
 // register controller
 ChartJS.register(LinearScale, PointElement, Legend, Tooltip, ChartDataLabels);
 
 const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colors}, ref) {
+
 	const initialData = {
 		datasets: [
 			{
@@ -36,7 +38,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 				triggerHover(chartRef.current);
 			},
 			resize(){
-				chartRef?.current.resize(750,750);
+				chartRef?.current.resize(770,770);
 			}
 		};
 	});
@@ -44,7 +46,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 	// before print
 	window.addEventListener('beforeprint', () => {
 		if (chartRef.current !== null) {
-			chartRef?.current.resize(750,750);
+			chartRef?.current.resize(770,770);
 		}
 	});
 
@@ -70,16 +72,25 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 		chart.update();
 	}
 
+	// div element
 	const Div = styled('div')(({ theme }) => ({
 		position: 'absolute',
 		display: 'flex'
 	}));
 
+	// stack element
+	const Item = styled('div')(({ theme }) => ({
+		textAlign: 'center',
+	}));
+
 	return (
 		<>
+		<Stack>
+		<Box>
+			
+		</Box>
 			<Box
 				position={'relative'}
-				overflow={'hidden'}
 				sx={{
 					mx: 'auto',
 				  width:'100%',
@@ -94,7 +105,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 					sx={{
 						gridTemplateColumns: `${parseInt(value.xLow) + '%'} ${parseInt(value.xAverage) + '%'} ${
 							parseInt(value.xHigh) + '%'
-						}`,width: '100%',overflow:'hidden'
+						}`,width: '100%',
 					}}
 				>
 					<Box>
@@ -105,16 +116,16 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 								bottom: 0,
 								justifyContent: 'center',
 								alignItems: 'flex-end',
-								'&.low::before': {
+								'&::before': {
 									content: '"Low"',
 									position:'absolute',
 									top:'50%',
 									left: 10,
+									display:parseInt(value.yLow) === 0 ? 'none' : ''
 								},
 								backgroundColor:red[300],
 							}}
 						>
-							Low
 						</Div>
 						<Div
 							sx={{
@@ -123,6 +134,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 								bottom: parseInt(value.yLow) + '%',
 								zIndex: 1,
 								alignItems: 'center',
+								display:parseInt(value.yAverage) === 0 ? 'none' : '',
 								pl: 1,
 								backgroundColor:orange.A200,
 							}}
@@ -136,6 +148,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 								height: parseInt(value.yHigh) + '%',
 								zIndex: 1,
 								alignItems: 'center',
+								display:parseInt(value.yHigh) === 0 ? 'none' : '',
 								pl: 1,
 								backgroundColor:yellow.A100,
 							}}
@@ -147,33 +160,34 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 						<Div
 							sx={{
 								width: parseInt(value.xAverage) + '%',
-								justifyContent: 'center',
-								alignItems: 'flex-end',
 								bottom: 0,
 								height: '100%',
 								backgroundColor:orange.A200,
 							}}
 						>
-							Average
 						</Div>
 					</Box>
 					<Box>
 						<Div
 							sx={{
 								width: parseInt(value.xHigh) + '%',
-								justifyContent: 'center',
-								alignItems: 'flex-end',
 								bottom: 0,
 								height: '100%',
 								backgroundColor:yellow.A100,
 							}}
 						>
-							High
 						</Div>
 					</Box>
 				</Box>
 				<Bubble ref={chartRef} options={chartConfig} data={data} />
+
+				<Stack position={'absolute'} flexDirection={'row'} width={'100%'}>
+					<Item sx={{flexBasis:value.xLow+"%",display:parseInt(value.xLow) === 0 ? 'none' : ''}}>Low</Item>
+					<Item sx={{flexBasis:value.xAverage+"%",display:parseInt(value.xAverage) === 0 ? 'none' : ''}}>Average</Item>
+					<Item sx={{flexBasis:value.xHigh+"%",display:parseInt(value.xHigh) === 0 ? 'none' : ''}}>High</Item>
+				</Stack>
 			</Box>
+			</Stack>
 		</>
 	);
 }));

@@ -16,7 +16,6 @@ import { flushSync } from 'react-dom';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { axis } from '../../config';
 
-
 function TestSelection() {
 	const routeData = useLoaderData();
 	const navigate = useNavigate();
@@ -35,7 +34,7 @@ function TestSelection() {
 		xHigh: 50,
 		yLow: 25,
 		yAverage: 25,
-		yHigh: 50,
+		yHigh: 50
 	});
 
 	const [position, setPosition] = useState([]);
@@ -48,7 +47,7 @@ function TestSelection() {
 		verticalChartError: false
 	});
 
-  const [isGenerated, setGenerated] = useState(false);
+	const [isGenerated, setGenerated] = useState(false);
 	const [candidates, setCandidates] = useState([]);
 	const [testData, setTestData] = useState([]);
 
@@ -80,7 +79,11 @@ function TestSelection() {
 	// #region
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const Chart = useCallback(()=> <BarChart value={value} colors={colors} ref={chartRef} bubblePosition={position} />,[isGenerated]);
+	const Chart = useCallback(
+		() => <BarChart value={value} colors={colors} ref={chartRef} bubblePosition={position} />,
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[isGenerated]
+	);
 
 	if (state === null) {
 		return navigate('/');
@@ -115,8 +118,7 @@ function TestSelection() {
 		)
 	].join(',');
 
-	const horizontalTotal =
-		parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh);
+	const horizontalTotal = parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh);
 	const verticalTotal = parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh);
 
 	// set validation
@@ -237,7 +239,7 @@ function TestSelection() {
 			setPrint(true);
 			chartRef.current.update();
 		}
-		setGenerated((prev)=> !prev);
+		setGenerated((prev) => !prev);
 	};
 
 	const handlePositionData = (data, xAxis, yAxis) => {
@@ -340,7 +342,7 @@ function TestSelection() {
 			}
 		}
 		chartRef.current.update();
-		setGenerated((prev)=> !prev);
+		setGenerated((prev) => !prev);
 	};
 
 	// handle if axis values are different
@@ -438,7 +440,7 @@ function TestSelection() {
 					setPosition(array);
 				});
 				setPrint(true);
-				setGenerated((prev)=> !prev);
+				setGenerated((prev) => !prev);
 				chartRef.current.update();
 			})
 			.catch((e) => setPrint(false));
@@ -498,10 +500,8 @@ function TestSelection() {
 	};
 
 	const getPosition = async (xAxis, yAxis) => {
-		const horizontalTotal =
-			parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh) !== 100;
-		const verticalTotal =
-			parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh) !== 100;
+		const horizontalTotal = parseInt(value.xLow) + parseInt(value.xAverage) + parseInt(value.xHigh) !== 100;
+		const verticalTotal = parseInt(value.yLow) + parseInt(value.yAverage) + parseInt(value.yHigh) !== 100;
 		if (horizontalTotal) {
 			setValid({ ...isValid, horizontalChartError: true });
 		} else if (verticalTotal) {
@@ -513,12 +513,12 @@ function TestSelection() {
 	};
 
 	// region set label colors
-	let labelColors =['#455a64','#424242','#5d4037']
+	let labelColors = ['#455a64', '#424242', '#5d4037'];
 	let colors = position.map((el, i) => {
 		let newColor = Math.floor(Math.random() * labelColors.length);
 		return labelColors[newColor];
 	});
-	//#end region 
+	//#end region
 
 	// on change input
 	const handleChange = (e) =>
@@ -695,13 +695,7 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={4} sm={6} marginBottom={3}>
 							<FormControl fullWidth>
-								<Box
-									component={'label'}
-									fontWeight={600}
-									textTransform="capitalize"
-									display={'block'}
-									htmlFor="xLow"
-								>
+								<Box component={'label'} fontWeight={600} textTransform="capitalize" display={'block'} htmlFor="xLow">
 									Horizontal Low
 								</Box>
 								<TextField
@@ -737,13 +731,7 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={4} sm={6} marginBottom={3}>
 							<FormControl fullWidth>
-								<Box
-									component={'label'}
-									display={'block'}
-									fontWeight={600}
-									textTransform="capitalize"
-									htmlFor="xHigh"
-								>
+								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="xHigh">
 									Horizontal High
 								</Box>
 								<TextField
@@ -758,13 +746,7 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={4} sm={6} marginBottom={3}>
 							<FormControl fullWidth>
-								<Box
-									component={'label'}
-									fontWeight={600}
-									textTransform="capitalize"
-									display={'block'}
-									htmlFor="yLow"
-								>
+								<Box component={'label'} fontWeight={600} textTransform="capitalize" display={'block'} htmlFor="yLow">
 									Vertical Low
 								</Box>
 								<TextField
@@ -800,13 +782,7 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} md={4} sm={6} marginBottom={3}>
 							<FormControl fullWidth>
-								<Box
-									component={'label'}
-									display={'block'}
-									fontWeight={600}
-									textTransform="capitalize"
-									htmlFor="yHigh"
-								>
+								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="yHigh">
 									Vertical High
 								</Box>
 								<TextField
@@ -827,12 +803,12 @@ function TestSelection() {
 								>
 									The total of low, average, high should be equal to 100.
 									<br />
-									Current total for the horizontal chart is:-
+									Current total for the horizontal axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{horizontalTotal}
 									</Box>
 									<br />
-									Current total for the vertical chart is :-
+									Current total for the vertical axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{verticalTotal}
 									</Box>
@@ -852,18 +828,19 @@ function TestSelection() {
 									variant="contained"
 									sx={{ ml: 5 }}
 									onClick={() => {
-										flushSync(()=>	{chartRef.current.resize();
+										flushSync(() => {
+											chartRef.current.resize();
 											chartRef.current.print();
 										});
-									setTimeout(()=>window.print(),200)
+										setTimeout(() => window.print(), 250);
 									}}
 								>
 									Print
 								</Button>
 							)}
 						</Grid>
-						<Grid item xl={12}>
-						<Chart/>
+						<Grid item xl={12} sx={{ mb: 10, mt: 4 }}>
+							<Chart />
 						</Grid>
 					</Grid>
 
