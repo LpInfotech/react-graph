@@ -28,6 +28,7 @@ const BarChart = memo(forwardRef(function BarChart({ value, bubblePosition, colo
 	const [data, setData] = useState(initialData);
 	const chartRef = useRef(null);
 
+	// control ref
 	useImperativeHandle(ref, () => {
 		return {
 			update() {
