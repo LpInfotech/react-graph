@@ -72,9 +72,12 @@ function TestSelection() {
 				} catch (e) {
 					console.log(e);
 				}
+			}else{
+				return navigate('/');
 			}
 		}
 		getSelectedCandidates();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state]);
 	// #region
 
@@ -84,10 +87,6 @@ function TestSelection() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[isGenerated]
 	);
-
-	if (state === null) {
-		return navigate('/');
-	}
 
 	const aplList = [
 		...new Set(
@@ -499,8 +498,8 @@ function TestSelection() {
 		}
 	};
 
+	// get position
 	const getPosition = async (xAxis, yAxis) => {
-		debugger;
 		const isHorizontalTotal = horizontalTotal !== 100;
 		const isVerticalTotal = verticalTotal !== 100;
 		if (isHorizontalTotal) {
