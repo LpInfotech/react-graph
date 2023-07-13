@@ -531,6 +531,9 @@ function TestSelection() {
 			if (!isNaN(numberValue) && numberValue >= 100) {
 				value = '100';
 				return { ...prev, [e.target.name]: value };
+			}else if(!isNaN(numberValue) && numberValue < 0){
+            value = '0'
+						return { ...prev, [e.target.name]: value };
 			} else {
 				return { ...prev, [e.target.name]: e.target.value };
 			}
@@ -803,15 +806,15 @@ function TestSelection() {
 								>
 									The total of low, average, high should be equal to 100.
 									<br />
-									Current total for the horizontal axis is :-
+									{!isNaN(horizontalTotal)? <>Current total for the horizontal axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{horizontalTotal}
-									</Box>
+									</Box></>:<Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}>Please enter valid input.</Box>}
 									<br />
-									Current total for the vertical axis is :-
+									{!isNaN(verticalTotal) ? <>Current total for the vertical axis is :-
 									<Box component={'span'} fontWeight={'600'}>
 										{verticalTotal}
-									</Box>
+									</Box></>:<Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}>Please enter valid input.</Box>}
 								</Alert>
 							</Grid>
 						)}
