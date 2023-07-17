@@ -138,7 +138,6 @@ const BarChart = memo(
 										bottom: Number(value.yLow)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yAverage) === 0 ? 'none' : '',
 										pl: 1,
 										backgroundColor: orange.A200,
 										'&::before': {
@@ -158,7 +157,6 @@ const BarChart = memo(
 										height: Number(value.yHigh)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yHigh) === 0 ? 'none' : '',
 										pl: 1,
 										backgroundColor: yellow.A100,
 										'&::before': {
@@ -173,15 +171,6 @@ const BarChart = memo(
 								></Div>
 							</Box>
 							<Box>
-								{/* <Div
-							sx={{
-								width: Number(value.xAverage) + '%',
-								bottom: 0,
-								height: '100%',
-								backgroundColor:orange.A200,
-							}}
-						>
-						</Div> */}
 								<Div
 									sx={{
 										width: Number(value.xAverage)+'%',
@@ -189,7 +178,6 @@ const BarChart = memo(
 										bottom: '0',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yAverage) === 0 ? 'none' : '',
 										backgroundColor: orange.A200,
 									}}
 								></Div>
@@ -211,21 +199,12 @@ const BarChart = memo(
 										height: Number(value.yHigh)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yHigh) === 0 ? 'none' : '',
 										backgroundColor: yellow[200]
 									}}
 								>
 								</Div>
 							</Box>
 							<Box>
-								{/* <Div
-							sx={{
-								width: Number(value.xHigh) + '%',
-								bottom: 0,
-								height: '100%',
-								backgroundColor:yellow.A100,
-							}}
-						>						</Div> */}
 								<Div
 									sx={{
 										bottom: 0,
@@ -233,7 +212,6 @@ const BarChart = memo(
 										height: Number(value.yLow)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yHigh) === 0 ? 'none' : '',
 										backgroundColor: yellow.A100
 									}}
 								></Div>
@@ -244,7 +222,6 @@ const BarChart = memo(
 										bottom: Number(value.yLow)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										// display: Number(value.yAverage) === 0 ? 'none' : '',
 										backgroundColor: lightGreen.A100
 									}}
 								></Div>
