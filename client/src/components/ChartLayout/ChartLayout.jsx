@@ -1,41 +1,150 @@
-import React,{useState} from 'react'
-import './tet.css'
+// import React from 'react';
+// import {
+//   Chart as ChartJS,
+//   LinearScale,
+//   PointElement,
+//   Tooltip,
+//   Legend,
+// } from 'chart.js';
+// import { Bubble } from 'react-chartjs-2';
+// const nineGridLabels = {
+//   id: 'nineGridLabels',
+//   beforeDatasetsDraw:((chart,args,plugin)=>{
+//     const {ctx,chartArea:{top,bottom,left,right,width},scales:{x,y}}= chart;
 
-function ChartLayout() {
-  const [value,setValue] = useState({
-    xLow:30,
-    xAverage:30,
-    xHigh:40,
-    yLow:50,
-    yAverage:30,
-    yHigh:20  
-  })
+//     const nineLabels = {labels:[
+//       {
+//       name:'A1',x:16.65,y:16.65
+//     },{
+//       name:'A2',x:16.65,y:49.95
+//     }
+//     ,{
+//       name:'A3',x:16.65,y:83.25
+//     },
+//     {
+//       name:'B1',x:49.95,y:16.65
+//     },{
+//       name:'B2',x:49.95,y:49.95
+//     }
+//     ,{
+//       name:'B3',x:49.95,y:83.25
+//     },
+//     {
+//       name:'C1',x:83.25,y:16.65
+//     },{
+//       name:'C2',x:83.25,y:49.95
+//     }
+//     ,{
+//       name:'C3',x:83.25,y:83.25
+//     }
+  
+//   ]}
 
-const handleChange = (e) => {
-  setValue({...value,[e.target.name]:e.target.value})
-}
+//   console.log(x,y)
 
-// style={{marginBottom:'32px',display:'flex',alignItems: 'center',justifyContent: 'space-between',flexWrap:'wrap'}}
-  return (
-    <>
-    <div >
-<input type="text" name="xLow" onChange={(e)=>handleChange(e)} placeholder="xLow" value={value.xLow} />
-<input type="text" name="xAverage" onChange={(e)=>handleChange(e)} placeholder="xAverage" value={value.xAverage} />
-<input type="text" name="xHigh" onChange={(e)=>handleChange(e)} placeholder="xHigh" value={value.xHigh} />
-<input type="text" name="yLow" onChange={(e)=>handleChange(e)} placeholder='yLow' value={value.yLow}/>
-<input type="text" name="yAverage" onChange={(e)=>handleChange(e)} placeholder='yAverage' value={value.yAverage}/>
-<input type="text" name="yHigh" onChange={(e)=>handleChange(e)} placeholder='yHigh' value={value.yHigh}/>
-</div>
+//     ctx.save();
+//     ctx.font = "bold 12px";
+//     ctx.fillStyle = "rgb(102,102,102)";
+//     ctx.textAlign = "center";
 
-<div className="wrapper" style={{	gridTemplateColumns:`${value.xLow + "%"} ${value.xAverage+ "%"} ${value.xHigh+ "%"}`,display:'none'}}>
-test
-</div>
-</>
-  )
-}
+//     nineLabels.labels.forEach((label,index) => {
+//       ctx.fillText(label.name,x.getPixelForValue(label.x),y.getPixelForValue(label.y),);
+    
+//     })
+   
+//   })
 
-export default ChartLayout
+// }
 
 
+// ChartJS.register(
+//   nineGridLabels,
+//   LinearScale,
+//   PointElement,
+//   Legend,
+//   Tooltip,
+//   LinearScale,
+//   Tooltip,
+//   Legend
+// );
+
+// const labels = ['January', 'February', 'March',];
 
 
+// const config = {
+// 	plugins: {
+// 		legend: {
+// 			display: false
+// 		},
+// 		title: {
+// 			display: true
+// 		},
+// 		// tooltip: {
+// 		// 	filter: (tooltipItem) => tooltipItem.datasetIndex === 0
+// 		// }
+// 	},
+// 	responsive: true,
+//   aspectRatio:1,
+// 	scales: {
+// 		// x: {
+//     //   max:100,
+//     //   min:0,
+// 		// 	beginAtZero: true,
+// 		// 	stacked: true,
+// 		// 	grid: {
+// 		// 		display: true
+// 		// 	}
+// 		// },
+//     x:{
+//       min:0,
+//       beginAtZero: true,
+// 			grid: {
+// 				drawTicks: false,
+// 			},
+//       afterTickToLabelConversion: (ctx)=>{
+//         console.log(ctx)
+//         ctx.ticks =[];
+//         ctx.ticks.push({value:33.33,label:'a'})
+//         ctx.ticks.push({value:66.66,label:'b'})
+//        },
+//        border:{
+//         width:2,
+//        },
+//        title:{display:true,text:'Potential'}
+       
+//     },
+// 		y: {
+//       min:0,
+//       beginAtZero: true,
+// 			grid: {
+// 				drawTicks: false,
+// 			},
+//       afterTickToLabelConversion: (ctx)=>{
+//         console.log(ctx)
+//         ctx.ticks =[];
+//         ctx.ticks.push({value:33.33,label:'a'})
+//         ctx.ticks.push({value:66.66,label:'b'})
+//        },
+//        border:{
+//         width:2,
+//        },
+//        title:{display:true,text:'Impact'}
+
+// 		}
+// 	},
+// };
+
+// export const data = {
+//   labels,
+//   datasets: [
+//     {
+//       label: 'bubbles',
+//       backgroundColor: 'rgb(53,192,132)',
+//       data:[{label:1,x:100,y:100 ,r:10}],
+//     },
+//   ],
+// };
+
+// export default function MultiChart() {
+//   return <Bubble options={config} data={data}/>
+// }

@@ -15,6 +15,7 @@ import Alert from '@mui/material/Alert';
 import { flushSync } from 'react-dom';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { axis } from '../../config';
+import MultiChart from '../../components/ChartLayout/ChartLayout';
 
 function TestSelection() {
 	const routeData = useLoaderData();
@@ -859,6 +860,23 @@ function TestSelection() {
 						>
 							<Chart />
 						</Grid>
+						{/* <Grid
+							item
+							xl={12}
+							sx={{
+								mb: 10,
+								mt: 4,
+								flexGrow: 1,
+								'@media print and (min-width: 320px)': {
+									flexGrow: 0
+								},
+								'@media screen and (max-width: 320px)': {
+									flexGrow: 0
+								}
+							}}
+						>
+							<MultiChart/>
+						</Grid> */}
 					</Grid>
 
 					{/* grid */}
