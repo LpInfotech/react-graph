@@ -35,8 +35,8 @@ function TestSelection() {
 		yLow: 25,
 		yAverage: 25,
 		yHigh: 50,
-		aplWeight:50,
-		raziWeight:50
+		aplWeight: 50,
+		raziWeight: 50
 	});
 
 	const [position, setPosition] = useState([]);
@@ -61,7 +61,7 @@ function TestSelection() {
 					await fetch('/get/candidates?id=' + state.join(','))
 						.then((response) => response.json())
 						.then((data) => {
-							setCandidates(data.map((el,i)=>{return{...el,index:i+1}}));
+							setCandidates(data.map((el, i) => { return { ...el, index: i + 1 } }));
 						});
 
 					await fetch('/get/test?id=' + state.join(','))
@@ -145,7 +145,7 @@ function TestSelection() {
 						return {
 							x: el._resultadofinal,
 							y: el._resultadofinal,
-							label:candidates.find((elm) => elm.can_id === el._idCandidato).index,
+							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
 							r: 10,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
@@ -209,7 +209,7 @@ function TestSelection() {
 						return {
 							x: el.calceranking,
 							y: el.calceranking,
-							label:candidates.find((elm) => elm.can_id === name[i]._idCandidato).index,
+							label: candidates.find((elm) => elm.can_id === name[i]._idCandidato).index,
 							r: 10,
 							name: candidates.find((el) => el.can_id === name[i]._idCandidato)
 						};
@@ -243,103 +243,100 @@ function TestSelection() {
 
 	const handlePositionData = (data, xAxis, yAxis) => {
 		let positionX, positionY;
-		if ((xAxis === 'razi' || xAxis === 'apl&razi') && (yAxis === 'apl' || yAxis === 'apl&razi')) {
-			if ((xAxis === 'apl&razi') && ((yAxis === 'apl'))) {
-				positionX = data[0]
-					.flat()
-					.flat()
-					.filter((el) => el._resultadofinal);
-				positionY = data[1]
-					.flat()
-					.flat()
-					.filter((el) => el.calceranking);
-				let array = positionX.map((el, i) => {
+
+		if (((xAxis === 'apl&razi') || (yAxis === 'apl&razi')) && ((yAxis === 'apl') || (xAxis === 'apl'))) {
+
+			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
+			positionX = data[1]
+				.flat()
+				.flat()
+				.filter((el) => el._resultadofinal);
+
+			positionY = data[0].map((el, i, array) => {
+				return { _idCandidato: array[i].flat().flat().find(el => el._idCandidato)._idCandidato, calceranking: array[i].flat().flat().find(el => el.calceranking).calceranking }
+			});
+
+			let array;
+
+			if (aplRaziIndex === 0) {
+				array = positionY.map((el, i) => {
+					let raziValue = positionX.find(elm => elm._idCandidato === el._idCandidato)._resultadofinal;
+					let razi = (el.calceranking * (value.aplWeight / 100)) + (raziValue * (value.raziWeight / 100));
 					return {
-						x: positionY[i].calceranking * (positionY[i].calceranking / 100),
-						y: el._resultadofinal * (el._resultadofinal / 100),
-						label: i + 1,
-						r: 10,
-						name: candidates.find((elm) => elm.can_id === el._idCandidato)
-					};
-				});
-
-				flushSync(() => {
-					setPosition(array);
-				});
-
-				setPrint(true);
-			} else {
-				positionX = data[0]
-					.flat()
-					.flat()
-					.filter((el) => el._resultadofinal);
-			  	positionY = data[1].map((el,i,array)=>{
-						return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
-					}
-					);
-
-				let array = positionX.map((el, i,array) => {
-						return {
-							x: el._resultadofinal,
-							y: positionY.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
-							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
-							name: candidates.find((elm) => elm.can_id === el._idCandidato)
-						};
-					});
-					
-
-				flushSync(() => {
-					setPosition(array);
-				})
-			}
-		} else if ((xAxis === 'apl' || xAxis === 'apl&razi') && (yAxis === 'razi' || yAxis === 'apl&razi')) {
-			if (yAxis === 'apl&razi') {
-				positionY = data[1]
-					.flat()
-					.flat()
-					.filter((el) => el._resultadofinal);
-				positionX = data[0]
-					.flat()
-					.flat()
-					.filter((el) => el.calceranking);
-
-				let array = positionY.map((el, i) => {
-					return {
-						x: positionX[i].calceranking * (positionX[i].calceranking / 100),
-						y: el._resultadofinal * (el._resultadofinal / 100),
-						label: i + 1,
-						r: 10,
-						name: candidates.find((elm) => elm.can_id === el._idCandidato)
-					};
-				});
-
-				flushSync(() => {
-					setPosition(array);
-				});
-
-				setPrint(true);
-			} else {
-				positionX = data[0].map((el,i,array)=>{
-					return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
-				});
-				positionY = data[1].flat().flat().filter((el) => el._resultadofinal);
-
-				let array = positionY.map((el, i,array) => {
-					return {
-						x: positionX.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
-						y: el._resultadofinal,
+						x: el.calceranking,
+						y: razi,
 						label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
 						r: 10,
 						name: candidates.find((elm) => elm.can_id === el._idCandidato)
 					};
-				});
-
-				flushSync(() => {
-					setPosition(array);
 				})
-
 			}
+			else {
+				array = positionY.map((el, i) => {
+					let raziValue = positionX.find(elm => elm._idCandidato === el._idCandidato)._resultadofinal;
+					let razi = (el.calceranking * (value.aplWeight / 100)) + (raziValue * (value.raziWeight / 100));
+
+					return {
+						y: el.calceranking,
+						x: razi,
+						label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+						r: 10,
+						name: candidates.find((elm) => elm.can_id === el._idCandidato)
+					};
+				})
+			}
+
+			flushSync(() => {
+				setPosition(array);
+			});
+
+			setPrint(true);
+		} else if (((xAxis === 'apl&razi') || (yAxis === 'apl&razi')) && (yAxis === 'razi' || xAxis === 'razi')) {
+			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
+
+			positionX = data[1]
+				.flat()
+				.flat()
+				.filter((el) => el._resultadofinal);
+
+			positionY = data[0].map((el, i, array) => {
+				return { _idCandidato: array[i].flat().flat().find(el => el._idCandidato)._idCandidato, calceranking: array[i].flat().flat().find(el => el.calceranking).calceranking }
+			});
+
+			debugger
+
+			let array = aplRaziIndex === 1 ? positionX.map((el, i) => {
+				let aplValue = positionY.find(elm => elm._idCandidato === el._idCandidato).calceranking;
+				let apl = (aplValue * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight / 100));
+				return {
+					x: el._resultadofinal,
+					y: apl,
+					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+					r: 10,
+					name: candidates.find((elm) => elm.can_id === el._idCandidato)
+				};
+			}) : positionX.map((el, i) => {
+				let aplValue = positionY.find(elm => elm._idCandidato === el._idCandidato).calceranking;
+				let apl = (aplValue * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight / 100));
+				return {
+					x: apl,
+					y: el._resultadofinal,
+					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+					r: 10,
+					name: candidates.find((elm) => elm.can_id === el._idCandidato)
+				};
+			})
+
+			console.log(array)
+			flushSync(() => {
+				setPosition(array);
+			});
+
+			setPrint(true);
+		} else if ((xAxis === 'apl') && (yAxis === 'razi')) {
+
+		} else if ((xAxis === 'razi') && (yAxis === 'apl')) {
+
 		}
 		chartRef.current.update();
 		setGenerated((prev) => !prev);
@@ -359,7 +356,9 @@ function TestSelection() {
 							: '';
 		let xPosition, yPosition;
 		// check if test include the apl+razi
-		if (xAxis === 'apl&razi' || yAxis === 'apl&razi') {
+		if (((xAxis === 'apl&razi') && ((yAxis === 'razi') || (yAxis === 'apl') || (yAxis === 'performance'))) || ((yAxis === 'apl&razi')
+			&& ((xAxis === 'razi') || (xAxis === 'apl') || (xAxis === 'performance'))
+		)) {
 			xPosition = await fetch('/get/apl?id=' + id).then((response) => response.json());
 			yPosition = await fetch('/get/razi?id=' + id).then((response) => response.json());
 		} else {
@@ -386,15 +385,15 @@ function TestSelection() {
 						.flat()
 						.filter((el) => el._resultadofinal);
 
-					apl = response[0].map((el,i,array)=>{
-							return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
-						}
-						);
+					apl = response[0].map((el, i, array) => {
+						return { _idCandidato: array[i].flat().flat().find(el => el._idCandidato)._idCandidato, calceranking: array[i].flat().flat().find(el => el.calceranking).calceranking }
+					}
+					);
 
 
 					array = razi.map((el, i) => {
-						let aplValue = apl.find(elm=>elm._idCandidato === el._idCandidato).calceranking;
-						let axis = (aplValue * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight /100));
+						let aplValue = apl.find(elm => elm._idCandidato === el._idCandidato).calceranking;
+						let axis = (aplValue * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight / 100));
 						return {
 							x: axis,
 							y: axis,
@@ -408,7 +407,7 @@ function TestSelection() {
 					apl = response[0].flat().filter((el) => el.calceranking);
 					let obj = [{ ...apl[0], ...razi[0] }];
 					array = obj.map((el, i) => {
-						let axis = (el.calceranking * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight /100));
+						let axis = (el.calceranking * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight / 100));
 						return {
 							x: axis,
 							y: axis,
@@ -653,38 +652,38 @@ function TestSelection() {
 							</FormControl>
 						</Grid>
 						{
-					  (value.xAxis === "apl&razi" || value.yAxis === "apl&razi") &&		<>
-						<Grid item xs={12} md={3} sm={6}>
-						<FormControl fullWidth>
-								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="aplWeight">
-									Apl Weight
-								</Box>
-								<TextField
-									id="aplWeight"
-									inputProps={{ min: 0, max: 100, step: 5 }}
-									type="number"
-									name="aplWeight"
-									value={value.aplWeight}
-									onChange={(e) => handleChange(e)}
-								/>
-							</FormControl>
-						</Grid>
-						<Grid item xs={12} md={3} sm={6}>
-						<FormControl fullWidth>
-								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="raziWeight">
-									Razi Weight
-								</Box>
-								<TextField
-									id="raziWeight"
-									inputProps={{ min: 0, max: 100, step: 5 }}
-									type="number"
-									name="raziWeight"
-									value={value.raziWeight}
-									onChange={(e) => handleChange(e)}
-								/>
-							</FormControl>
-						</Grid>
-						</>
+							(value.xAxis === "apl&razi" || value.yAxis === "apl&razi") && <>
+								<Grid item xs={12} md={3} sm={6}>
+									<FormControl fullWidth>
+										<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="aplWeight">
+											Apl Weight
+										</Box>
+										<TextField
+											id="aplWeight"
+											inputProps={{ min: 0, max: 100, step: 5 }}
+											type="number"
+											name="aplWeight"
+											value={value.aplWeight}
+											onChange={(e) => handleChange(e)}
+										/>
+									</FormControl>
+								</Grid>
+								<Grid item xs={12} md={3} sm={6}>
+									<FormControl fullWidth>
+										<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="raziWeight">
+											Razi Weight
+										</Box>
+										<TextField
+											id="raziWeight"
+											inputProps={{ min: 0, max: 100, step: 5 }}
+											type="number"
+											name="raziWeight"
+											value={value.raziWeight}
+											onChange={(e) => handleChange(e)}
+										/>
+									</FormControl>
+								</Grid>
+							</>
 						}
 						<Grid item xs={12}>
 							<Typography variant="h5" fontWeight={600}>
@@ -842,7 +841,7 @@ function TestSelection() {
 								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={1}>
 									Selected List
 								</Box>
-						  <Table data={candidates}/>
+								<Table data={candidates} />
 							</FormControl>
 						</Grid>
 						<Grid
