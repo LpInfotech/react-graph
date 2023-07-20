@@ -872,3 +872,62 @@ function TestSelection() {
 }
 
 export default TestSelection;
+
+
+
+
+
+
+
+
+
+
+// else {
+// 	positionX = data[0]
+// 		.flat()
+// 		.flat()
+// 		.filter((el) => el._resultadofinal);
+// 		positionY = data[1].map((el,i,array)=>{
+// 			return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
+// 		}
+// 		);
+
+// 	let array = positionX.map((el, i,array) => {
+// 			return {
+// 				x: el._resultadofinal,
+// 				y: positionY.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
+// 				label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+// 				r: 10,
+// 				name: candidates.find((elm) => elm.can_id === el._idCandidato)
+// 			};
+// 		});
+		
+
+// 	flushSync(() => {
+// 		setPosition(array);
+// 	})
+// }
+
+
+
+// else {
+// 	positionX = data[0].map((el,i,array)=>{
+// 		return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
+// 	});
+// 	positionY = data[1].flat().flat().filter((el) => el._resultadofinal);
+
+// 	let array = positionY.map((el, i,array) => {
+// 		return {
+// 			x: positionX.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
+// 			y: el._resultadofinal,
+// 			label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+// 			r: 10,
+// 			name: candidates.find((elm) => elm.can_id === el._idCandidato)
+// 		};
+// 	});
+
+// 	flushSync(() => {
+// 		setPosition(array);
+// 	})
+
+// }
