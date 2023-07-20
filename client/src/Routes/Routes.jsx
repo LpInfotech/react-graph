@@ -6,8 +6,9 @@ import TestSelection from "../pages/TestSelection/TestSelection";
 async function testSelectionData(){
  const profiles = await fetch('/get/profiles').then(response=>response.json());
  const norma = await fetch('/get/normaapl').then(response=>response.json());
+ const normaRazi = await fetch('/get/normarazi').then(response=>response.json());
 
-  return Promise.all([profiles,norma]);
+  return Promise.all([profiles,norma,normaRazi]);
 }
 
 

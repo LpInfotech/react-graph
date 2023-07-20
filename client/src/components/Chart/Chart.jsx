@@ -44,13 +44,6 @@ const BarChart = memo(
 			};
 		});
 
-		// before print
-		window.addEventListener('beforeprint', () => {
-			if (chartRef.current !== null) {
-				chartRef?.current.resize(750, 760);
-			}
-		});
-
 		// after print
 		window.addEventListener('afterprint', () => {
 			if (chartRef.current !== null) {
@@ -60,17 +53,17 @@ const BarChart = memo(
 
 		// trigger hover
 		function triggerHover(chart) {
-			const tooltip = chart?.tooltip;
-			if (tooltip.getActiveElements().length > 0) {
-				tooltip.setActiveElements([]);
-			} else {
-				tooltip.setActiveElements(
-					bubblePosition.map((el, i) => {
-						return { datasetIndex: 0, index: i };
-					})
-				);
-			}
-			chart.update();
+			// const tooltip = chart?.tooltip;
+			// if (tooltip.getActiveElements().length > 0) {
+			// 	tooltip.setActiveElements([]);
+			// } else {
+			// 	tooltip.setActiveElements(
+			// 		bubblePosition.map((el, i) => {
+			// 			return { datasetIndex: 0, index: i };
+			// 		})
+			// 	);
+			// }
+			// chart.update();
 		}
 
 		// div element
@@ -124,10 +117,12 @@ const BarChart = memo(
 											content: '"Low"',
 											pl: 2,
 											position: 'absolute',
-											left: '-30px',
+											left: '-32px',
 											transform: 'rotate(-90deg)',
 										 display: Number(value.yLow) === 0 ? 'none' : ''
 										},
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 										backgroundColor: red[300]
 									}}
 								></Div>
@@ -147,7 +142,9 @@ const BarChart = memo(
 											left: '-47px',
 											transform: 'rotate(-90deg)',
 											display: Number(value.yAverage) === 0 ? 'none' : ''
-										}
+										},
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 								<Div
@@ -163,10 +160,12 @@ const BarChart = memo(
 											content: '"High"',
 											pl: 2,
 											position: 'absolute',
-											left: '-32px',
+											left: '-35px',
 											transform: 'rotate(-90deg)',
 									  display: Number(value.yHigh) === 0 ? 'none' : ''
-										}
+										},
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 							</Box>
@@ -179,6 +178,8 @@ const BarChart = memo(
 										zIndex: 1,
 										alignItems: 'center',
 										backgroundColor: orange.A200,
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 								<Div
@@ -189,7 +190,9 @@ const BarChart = memo(
 										justifyContent: 'flex-start',
 										alignItems: 'center',
 										zIndex: Number(value.xLow) === 0 ? 1 : '',
-										backgroundColor: orange[500]
+										backgroundColor: orange[500],
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 								<Div
@@ -199,7 +202,9 @@ const BarChart = memo(
 										height: Number(value.yHigh)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										backgroundColor: yellow[200]
+										backgroundColor: yellow[200],
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								>
 								</Div>
@@ -212,7 +217,9 @@ const BarChart = memo(
 										height: Number(value.yLow)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										backgroundColor: yellow.A100
+										backgroundColor: yellow.A100,
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 								<Div
@@ -222,7 +229,9 @@ const BarChart = memo(
 										bottom: Number(value.yLow)+'%',
 										zIndex: 1,
 										alignItems: 'center',
-										backgroundColor: lightGreen.A100
+										backgroundColor: lightGreen.A100,
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 								<Div
@@ -233,7 +242,9 @@ const BarChart = memo(
 										justifyContent: 'flex-start',
 										alignItems: 'center',
 										zIndex: Number(value.xLow) === 0 ? 1 : '',
-										backgroundColor: lightGreen[300]
+										backgroundColor: lightGreen[300],
+										printColorAdjust: 'exact',
+										WebkitPrintColorAdjust:'exact',
 									}}
 								></Div>
 							</Box>

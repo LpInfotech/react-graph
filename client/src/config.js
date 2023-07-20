@@ -40,7 +40,6 @@ module.exports = {
         title: { display: false, },
         beginAtZero: true,
         min: 0,
-        max: 101,
         grid: {
           display: false,
           drawOnChartArea: false,
@@ -60,7 +59,6 @@ module.exports = {
         beginAtZero: true,
         title: { display: false, },
         min: 0,
-        max:102,
         grid: {
           display: false,
           drawOnChartArea: false,

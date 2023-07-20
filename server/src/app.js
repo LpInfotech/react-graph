@@ -39,6 +39,20 @@ const server = http.createServer(async function (req, res) {
 			});
 		}
 
+			// get normal Apl
+			case parseUrl.pathname === '/get/normaRazi' && req.method === 'GET': {
+				return fs.readFile(__dirname + '/db/SP_NormaRazi.json', 'utf8', function (err, data) {
+					if (err) {
+						console.log('File read failed:', err);
+						res.writeHead(500, { 'Content-Type': 'application/json' });
+						res.end(err);
+						throw new Error('File read failed');
+					}
+					res.writeHead(200, { 'Content-Type': 'application/json' });
+					res.end(data);
+				});
+			}
+
 		//  get profiles
 		case parseUrl.pathname === '/get/profiles' && req.method === 'GET': {
 			return fs.readFile(__dirname + '/db/SP_GetProfile.json', 'utf8', function (err, data) {

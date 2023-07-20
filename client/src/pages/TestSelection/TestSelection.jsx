@@ -13,8 +13,9 @@ import BarChart from '../../components/Chart/Chart';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
 import { flushSync } from 'react-dom';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import Table from '../../components/ListTable/ListTable';
 import { axis } from '../../config';
+
 
 function TestSelection() {
 	const routeData = useLoaderData();
@@ -22,7 +23,6 @@ function TestSelection() {
 	const { state } = useLocation();
 	const chartRef = useRef(null);
 	const [isPrint, setPrint] = useState(false);
-
 	const [value, setValue] = useState({
 		xAxis: 'razi',
 		yAxis: 'razi',
@@ -34,7 +34,9 @@ function TestSelection() {
 		xHigh: 50,
 		yLow: 25,
 		yAverage: 25,
-		yHigh: 50
+		yHigh: 50,
+		aplWeight:50,
+		raziWeight:50
 	});
 
 	const [position, setPosition] = useState([]);
@@ -59,11 +61,7 @@ function TestSelection() {
 					await fetch('/get/candidates?id=' + state.join(','))
 						.then((response) => response.json())
 						.then((data) => {
-							setCandidates(data);
-							let selected = data.map((el) => el.can_nombre + ' ' + el.can_apellido);
-							setValue((prev) => {
-								return { ...prev, candidates: selected };
-							});
+							setCandidates(data.map((el,i)=>{return{...el,index:i+1}}));
 						});
 
 					await fetch('/get/test?id=' + state.join(','))
@@ -72,12 +70,12 @@ function TestSelection() {
 				} catch (e) {
 					console.log(e);
 				}
-			}else{
+			} else {
 				return navigate('/');
 			}
 		}
 		getSelectedCandidates();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [state]);
 	// #region
 
@@ -87,6 +85,8 @@ function TestSelection() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[isGenerated]
 	);
+
+
 
 	const aplList = [
 		...new Set(
@@ -145,7 +145,7 @@ function TestSelection() {
 						return {
 							x: el._resultadofinal,
 							y: el._resultadofinal,
-							label: i + 1,
+							label:candidates.find((elm) => elm.can_id === el._idCandidato).index,
 							r: 10,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
@@ -209,7 +209,7 @@ function TestSelection() {
 						return {
 							x: el.calceranking,
 							y: el.calceranking,
-							label: i + 1,
+							label:candidates.find((elm) => elm.can_id === name[i]._idCandidato).index,
 							r: 10,
 							name: candidates.find((el) => el.can_id === name[i]._idCandidato)
 						};
@@ -243,9 +243,8 @@ function TestSelection() {
 
 	const handlePositionData = (data, xAxis, yAxis) => {
 		let positionX, positionY;
-
 		if ((xAxis === 'razi' || xAxis === 'apl&razi') && (yAxis === 'apl' || yAxis === 'apl&razi')) {
-			if (aplList.split(',').length > 1 && raziList.split(',').length > 1) {
+			if ((xAxis === 'apl&razi') && ((yAxis === 'apl'))) {
 				positionX = data[0]
 					.flat()
 					.flat()
@@ -270,29 +269,32 @@ function TestSelection() {
 
 				setPrint(true);
 			} else {
-				positionX = data[0].flat().filter((el) => el._resultadofinal);
-				positionY = data[1].flat().filter((el) => el.calceranking);
-				let obj = [{ ...positionX[0], ...positionY[0] }];
+				positionX = data[0]
+					.flat()
+					.flat()
+					.filter((el) => el._resultadofinal);
+			  	positionY = data[1].map((el,i,array)=>{
+						return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
+					}
+					);
 
-				obj.forEach((el, i) =>
-					flushSync(() => {
-						setPosition({
-							...position,
+				let array = positionX.map((el, i,array) => {
+						return {
 							x: el._resultadofinal,
-							y: el.calceranking,
-							label: i + 1,
+							y: positionY.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
+							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
 							r: 10,
-							name: candidates.map((elm) => {
-								return elm.can_id === data[1].flat().find((el) => el._idCandidato)._idCandidato
-									? { can_nombre: elm.can_nombre }
-									: '';
-							})
-						});
-					})
-				);
+							name: candidates.find((elm) => elm.can_id === el._idCandidato)
+						};
+					});
+					
+
+				flushSync(() => {
+					setPosition(array);
+				})
 			}
 		} else if ((xAxis === 'apl' || xAxis === 'apl&razi') && (yAxis === 'razi' || yAxis === 'apl&razi')) {
-			if (aplList.split(',').length > 1 && raziList.split(',').length > 1) {
+			if (yAxis === 'apl&razi') {
 				positionY = data[1]
 					.flat()
 					.flat()
@@ -318,26 +320,25 @@ function TestSelection() {
 
 				setPrint(true);
 			} else {
-				positionY = data[1].flat().filter((el) => el._resultadofinal);
-				positionX = data[0].flat().filter((el) => el.calceranking);
-				let obj = [{ ...positionX[0], ...positionY[0] }];
+				positionX = data[0].map((el,i,array)=>{
+					return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
+				});
+				positionY = data[1].flat().flat().filter((el) => el._resultadofinal);
 
-				obj.forEach((el, i) =>
-					flushSync(() => {
-						setPosition({
-							...position,
-							x: el.calceranking,
-							y: el._resultadofinal,
-							label: i + 1,
-							r: 10,
-							name: candidates.map((elm) => {
-								return elm.can_id === data[1].flat().find((el) => el._idCandidato)._idCandidato
-									? { can_nombre: elm.can_nombre }
-									: '';
-							})
-						});
-					})
-				);
+				let array = positionY.map((el, i,array) => {
+					return {
+						x: positionX.find(elm=>elm._idCandidato === el._idCandidato).calceranking,
+						y: el._resultadofinal,
+						label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+						r: 10,
+						name: candidates.find((elm) => elm.can_id === el._idCandidato)
+					};
+				});
+
+				flushSync(() => {
+					setPosition(array);
+				})
+
 			}
 		}
 		chartRef.current.update();
@@ -350,36 +351,17 @@ function TestSelection() {
 			(xAxis || yAxis) === 'apl'
 				? aplList
 				: (xAxis || yAxis) === 'performance'
-				? performanceList
-				: xAxis === 'razi'
-				? raziList
-				: (xAxis || yAxis) === 'apl&razi'
-				? aplList
-				: '';
+					? performanceList
+					: xAxis === 'razi'
+						? raziList
+						: (xAxis || yAxis) === 'apl&razi'
+							? aplList
+							: '';
 		let xPosition, yPosition;
 		// check if test include the apl+razi
 		if (xAxis === 'apl&razi' || yAxis === 'apl&razi') {
-			xPosition =
-				xAxis === 'apl'
-					? await fetch('/get/apl?id=' + id).then((response) => response.json())
-					: xAxis === 'razi'
-					? await fetch('/get/razi?id=' + id).then((response) => response.json())
-					: xAxis === 'apl&razi' && yAxis === 'razi'
-					? await fetch('/get/apl?id=' + id).then((response) => response.json())
-					: xAxis === 'apl&razi' && yAxis === 'apl'
-					? await fetch('/get/razi?id=' + id).then((response) => response.json())
-					: '';
-
-			yPosition =
-				yAxis === 'razi'
-					? await fetch('/get/razi?id=' + id).then((response) => response.json())
-					: yAxis === 'apl'
-					? await fetch('/get/apl?id=' + id).then((response) => response.json())
-					: yAxis === 'apl&razi' && xAxis === 'apl'
-					? await fetch('/get/razi?id=' + id).then((response) => response.json())
-					: yAxis === 'apl&razi' && xAxis === 'razi'
-					? await fetch('/get/apl?id=' + id).then((response) => response.json())
-					: '';
+			xPosition = await fetch('/get/apl?id=' + id).then((response) => response.json());
+			yPosition = await fetch('/get/razi?id=' + id).then((response) => response.json());
 		} else {
 			// if another test selected
 			xPosition = await fetch('/get/' + xAxis + '?id=' + id).then((response) => response.json());
@@ -404,16 +386,19 @@ function TestSelection() {
 						.flat()
 						.filter((el) => el._resultadofinal);
 
-					apl = response[0]
-						.flat()
-						.flat()
-						.filter((el) => el.calceranking);
+					apl = response[0].map((el,i,array)=>{
+							return{_idCandidato:array[i].flat().flat().find(el=>el._idCandidato)._idCandidato,calceranking:array[i].flat().flat().find(el=>el.calceranking).calceranking}
+						}
+						);
+
 
 					array = razi.map((el, i) => {
+						let aplValue = apl.find(elm=>elm._idCandidato === el._idCandidato).calceranking;
+						let axis = (aplValue * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight /100));
 						return {
-							x: apl[i].calceranking * (apl[i].calceranking / 100),
-							y: el._resultadofinal * (el._resultadofinal / 100),
-							label: i + 1,
+							x: axis,
+							y: axis,
+							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
 							r: 10,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
@@ -423,10 +408,11 @@ function TestSelection() {
 					apl = response[0].flat().filter((el) => el.calceranking);
 					let obj = [{ ...apl[0], ...razi[0] }];
 					array = obj.map((el, i) => {
+						let axis = (el.calceranking * (value.aplWeight / 100)) + (el._resultadofinal * (value.raziWeight /100));
 						return {
-							x: el.calceranking * (el.calceranking / 100),
-							y: el._resultadofinal * (el._resultadofinal / 100),
-							label: i + 1,
+							x: axis,
+							y: axis,
+							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
 							r: 10,
 							name: candidates.find(
 								(elm) => elm.can_id === response[1].flat().find((el) => el._idCandidato)._idCandidato
@@ -451,12 +437,12 @@ function TestSelection() {
 			xAxis === 'apl'
 				? aplList
 				: xAxis === 'performance'
-				? performanceList
-				: xAxis === 'razi'
-				? raziList
-				: xAxis === 'apl&razi'
-				? aplList
-				: '';
+					? performanceList
+					: xAxis === 'razi'
+						? raziList
+						: xAxis === 'apl&razi'
+							? aplList
+							: '';
 		const url = '/get/' + xAxis + '?id=' + id;
 		// if same position
 		if (xAxis === yAxis) {
@@ -514,10 +500,11 @@ function TestSelection() {
 
 	// region set label colors
 	let labelColors = ['#455a64', '#424242', '#5d4037'];
-	let colors = position.map((el, i) => {
+
+	let colors = position?.map((el, i) => {
 		let newColor = Math.floor(Math.random() * labelColors.length);
 		return labelColors[newColor];
-	});
+	})
 	//#end region
 
 	// on change input
@@ -531,9 +518,9 @@ function TestSelection() {
 			if (!isNaN(numberValue) && numberValue >= 100) {
 				value = '100';
 				return { ...prev, [e.target.name]: value };
-			}else if(!isNaN(numberValue) && numberValue < 0){
-            value = '0'
-						return { ...prev, [e.target.name]: value };
+			} else if (!isNaN(numberValue) && numberValue < 0) {
+				value = '0'
+				return { ...prev, [e.target.name]: value };
 			} else {
 				return { ...prev, [e.target.name]: e.target.value };
 			}
@@ -654,43 +641,51 @@ function TestSelection() {
 											{el.nt_Nombre}
 										</MenuItem>
 									))}
+									{routeData[2][0].response[0].map((el) => (
+										<MenuItem key={el.na_id} value={el.na_nombre}>
+											{el.na_nombre}
+										</MenuItem>
+									))}
 								</Select>
 								<FormHelperText error sx={{ visibility: isValid.norm ? 'visible' : 'hidden' }}>
 									Norm is required with APL test.
 								</FormHelperText>
 							</FormControl>
 						</Grid>
-						<Grid item xs={12} marginBottom={3}>
-							<FormControl fullWidth>
-								<Box id="candidatesLabel" fontWeight={600} textTransform="capitalize">
-									Selected List
+						{
+					  (value.xAxis === "apl&razi" || value.yAxis === "apl&razi") &&		<>
+						<Grid item xs={12} md={3} sm={6}>
+						<FormControl fullWidth>
+								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="aplWeight">
+									Apl Weight
 								</Box>
-								<Select
-									multiple={true}
-									labelId="candidatesLabel"
-									onChange={(e) => setValue({ ...value, candidates: e.target.value.split(',') })}
-									id="candidate"
-									value={value.candidates}
-									name="candidate"
-									displayEmpty
-									input={<OutlinedInput />}
-									inputProps={{ 'aria-label': 'Without label' }}
-									renderValue={(selected) => {
-										if (selected.length === 0) {
-											return <em>None</em>;
-										}
-
-										return selected.join(', ');
-									}}
-								>
-									{candidates.map((el) => (
-										<MenuItem disabled={true} key={el.can_id} value={el.can_id}>
-											{el.can_nombre + ' ' + el.can_apellido}
-										</MenuItem>
-									))}
-								</Select>
+								<TextField
+									id="aplWeight"
+									inputProps={{ min: 0, max: 100, step: 5 }}
+									type="number"
+									name="aplWeight"
+									value={value.aplWeight}
+									onChange={(e) => handleChange(e)}
+								/>
 							</FormControl>
 						</Grid>
+						<Grid item xs={12} md={3} sm={6}>
+						<FormControl fullWidth>
+								<Box component={'label'} display={'block'} fontWeight={600} textTransform="capitalize" htmlFor="raziWeight">
+									Razi Weight
+								</Box>
+								<TextField
+									id="raziWeight"
+									inputProps={{ min: 0, max: 100, step: 5 }}
+									type="number"
+									name="raziWeight"
+									value={value.raziWeight}
+									onChange={(e) => handleChange(e)}
+								/>
+							</FormControl>
+						</Grid>
+						</>
+						}
 						<Grid item xs={12}>
 							<Typography variant="h5" fontWeight={600}>
 								Chart Settings
@@ -806,15 +801,15 @@ function TestSelection() {
 								>
 									The total of low, average, high should be equal to 100.
 									<br />
-									{!isNaN(horizontalTotal)? <>Current total for the horizontal axis is :-
-									<Box component={'span'} fontWeight={'600'}>
-										{horizontalTotal}
-									</Box></>:<>Horizontal axis :- <Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}> All fields should be filled.</Box></>}
+									{!isNaN(horizontalTotal) ? <>Current total for the horizontal axis is :-
+										<Box component={'span'} fontWeight={'600'}>
+											{horizontalTotal}
+										</Box></> : <>Horizontal axis :- <Box component={'span'} sx={{ color: (theme) => theme.palette.error.light }} fontWeight={'600'}> All fields should be filled.</Box></>}
 									<br />
 									{!isNaN(verticalTotal) ? <>Current total for the vertical axis is :-
-									<Box component={'span'} fontWeight={'600'}>
-										{verticalTotal}
-									</Box></>:<>Vertical axis :- <Box component={'span'} sx={{color:(theme)=>theme.palette.error.light}} fontWeight={'600'}> All fields should be filled.</Box></>}
+										<Box component={'span'} fontWeight={'600'}>
+											{verticalTotal}
+										</Box></> : <>Vertical axis :- <Box component={'span'} sx={{ color: (theme) => theme.palette.error.light }} fontWeight={'600'}> All fields should be filled.</Box></>}
 								</Alert>
 							</Grid>
 						)}
@@ -842,9 +837,17 @@ function TestSelection() {
 								</Button>
 							)}
 						</Grid>
+						<Grid item xs={12} lg={4} marginBottom={3}>
+							<FormControl fullWidth>
+								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={1}>
+									Selected List
+								</Box>
+						  <Table data={candidates}/>
+							</FormControl>
+						</Grid>
 						<Grid
 							item
-							xl={12}
+							lg={8}
 							sx={{
 								mb: 10,
 								mt: 4,

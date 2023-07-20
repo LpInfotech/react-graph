@@ -38,7 +38,7 @@ const columns = [
 ];
 
 
-export default function Table({ data, selectValue, setSelected}) {
+export default function DataTable({ data, selectValue, setSelected}) {
   const rows = data.data.colaboradores.filter(el => (!selectValue._NombreDepartamento !== "" && el._NombreDepartamento.includes(selectValue._NombreDepartamento)) && (!selectValue._NombreJerarquia !== "" && el._NombreJerarquia.includes(selectValue._NombreJerarquia)) && (!selectValue._CodigoCargo !== "" && el._CodigoCargo.includes(selectValue._CodigoCargo)) && (!selectValue._NombreSucursal !== "" && el._NombreSucursal.includes(selectValue._NombreSucursal))
   );
 
@@ -71,7 +71,7 @@ export default function Table({ data, selectValue, setSelected}) {
 }
 
 
-Table.propTypes = {
+DataTable.propTypes = {
   data: PropTypes.object.isRequired,
   selectValue: PropTypes.object.isRequired
 }

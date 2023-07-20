@@ -8,9 +8,9 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { drawerWidth} from '../../config';
+import { drawerWidth } from '../../config';
 
-function DrawerAppBar({window,title}) {
+function DrawerAppBar({ window, title }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -22,7 +22,7 @@ function DrawerAppBar({window,title}) {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-       {title}
+        {title}
       </Typography>
       <Divider />
     </Box>
@@ -30,14 +30,17 @@ function DrawerAppBar({window,title}) {
 
   return (
     <Box component="header" sx={{ display: 'flex' }}>
-      <AppBar component="nav">
+      <AppBar component="nav" sx={{
+        printColorAdjust: 'exact',
+        WebkitPrintColorAdjust: 'exact',
+      }}>
         <Toolbar>
-        <Typography
+          <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1}}
+            sx={{ flexGrow: 1 }}
           >
-           {title}
+            {title}
           </Typography>
           <IconButton
             color="inherit"
@@ -57,7 +60,7 @@ function DrawerAppBar({window,title}) {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, 
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
@@ -73,7 +76,7 @@ function DrawerAppBar({window,title}) {
 
 // set Prop type
 DrawerAppBar.propTypes = {
-title: PropTypes.string
+  title: PropTypes.string
 };
 
 export default DrawerAppBar;
