@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLoaderData} from 'react-router-dom';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import Table from '../../components/DataTable/DataTable';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import FormSelect from '../../components/Select/FormSelect';
+import {Box,Grid,Button,Typography,Container} from '@mui/material';
 
 function Home() {
 	const candidatesData = useLoaderData();

@@ -104,7 +104,10 @@ const server = http.createServer(async function (req, res) {
 		//  get internal candidate with query string
 		case parseUrl.pathname === '/get/performance' && req.method === 'GET':
 			{
-				if(parseUrl.query.id.split(',').length === 1){
+		
+				if(parseUrl.query.id === ''){
+					res.end({message:"No record found!"})
+				}else if(parseUrl.query.id !== '' && parseUrl.query.id.split(',').length === 1){
 				fs.readFile(
 					__dirname +
 						`/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${parseUrl.query.id}.json`,
@@ -115,10 +118,12 @@ const server = http.createServer(async function (req, res) {
 							throw new Error('File read failed');
 						}
 						res.writeHead(200, { 'Content-Type': 'application/json' });
+						console.log(data)
 						res.end(data);
 					}
 				);
 				}else{
+					console.log('tester')
 					let arr = [];
 					parseUrl.query.id.split(',').forEach((el,i,array) => { 
 

@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import { FormHelperText,Box,Grid,Button,Typography,Container,FormControl,Select, MenuItem} from '@mui/material';
+import { FormHelperText, Box, Grid, Button, Typography, Container, FormControl, Select, MenuItem, TextField, Alert, Snackbar } from '@mui/material';
 import BarChart from '../../components/Chart/Chart';
-import TextField from '@mui/material/TextField';
-import Alert from '@mui/material/Alert';
 import { flushSync } from 'react-dom';
 import Table from '../../components/ListTable/ListTable';
-import { axis } from '../../config';
+import { axis, bubbleRadius } from '../../config';
 
 function TestSelection() {
 	const routeData = useLoaderData();
@@ -14,6 +12,11 @@ function TestSelection() {
 	const { state } = useLocation();
 	const chartRef = useRef(null);
 	const [isPrint, setPrint] = useState(false);
+	const [isSnackbar, setSnackbar] = useState({
+		open: false,
+		vertical: 'bottom',
+		horizontal: 'center',
+	});
 	const [value, setValue] = useState({
 		xAxis: 'razi',
 		yAxis: 'razi',
@@ -81,12 +84,7 @@ function TestSelection() {
 		[isGenerated]
 	);
 
-	if(value.candidates.length === 0 && candidates.length > 0){
-		let selected = candidates.map((el) => el.index +'. '+ el.can_nombre + ' ' + el.can_apellido);
-		setValue((prev) => {
-			return { ...prev, candidates: selected };
-		});
-	}
+	const { vertical, horizontal, open } = isSnackbar;
 
 	const aplList = [
 		...new Set(
@@ -121,11 +119,11 @@ function TestSelection() {
 	// set validation
 	if (isValid.profile && value.profile !== '') setValid({ ...isValid, profile: false });
 	else if (isValid.norm && value.norm !== '') setValid({ ...isValid, norm: false });
-	else if(value.xAxis === 'performance' && value.yAxis === 'performance' && isValid.norm){
-		setValid({norm: false });
+	else if (value.xAxis === 'performance' && value.yAxis === 'performance' && isValid.norm) {
+		setValid({ norm: false, profile: false });
 	}
 	else {
-		if (isValid.profile && isValid.norm && (value.xAxis !== 'apl' && value.yAxis !== 'apl')){
+		if (isValid.profile && isValid.norm && (value.xAxis !== 'apl' && value.yAxis !== 'apl')) {
 			setValid({ profile: false, norm: false });
 		}
 	}
@@ -136,7 +134,7 @@ function TestSelection() {
 
 	// handle if axis values are same
 	const handleEqualAxis = (xAxis, data) => {
-		if (xAxis === 'razi') {
+		if (xAxis === 'razi' && raziList !== '') {
 			let raziData;
 			if (raziList.split(',').length > 1) {
 				raziData = data
@@ -148,7 +146,7 @@ function TestSelection() {
 							x: el._resultadofinal,
 							y: el._resultadofinal,
 							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
@@ -161,7 +159,7 @@ function TestSelection() {
 							x: el._resultadofinal,
 							y: el._resultadofinal,
 							label: i + 1,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
@@ -172,7 +170,7 @@ function TestSelection() {
 			});
 			setPrint(true);
 			chartRef.current.update();
-		} else if (xAxis === 'performance') {
+		} else if (xAxis === 'performance' && performanceList !== '') {
 			let performance, array;
 			if (performanceList.split(',').length > 1) {
 				performance = data
@@ -191,19 +189,20 @@ function TestSelection() {
 						y: el.porcentaje,
 						name: candidates.find((elm) => name[i]._NombreCandidato.includes(elm.can_nombre)),
 						label: candidates.find((elm) => name[i]._NombreCandidato.includes(elm.can_nombre)).index,
-						r: 10
+						r: bubbleRadius
 					};
 				});
 			} else {
 				performance = data.flat().find((el) => el.porcentaje).porcentaje;
 				let selected = candidates.find((el) => el.can_id === +performanceList);
-				array = [{ x: performance, y: performance, label: 1, name: selected, r: 10 }];
+				array = [{ x: performance, y: performance, label: 1, name: selected, r: bubbleRadius }];
 			}
 
 			flushSync(() => {
 				setPosition(array);
 			});
-		} else {
+
+		} else if (xAxis === 'apl' && aplList !== '') {
 			let aplData;
 			if (aplList.split(',').length > 1) {
 				aplData = data
@@ -220,7 +219,7 @@ function TestSelection() {
 							x: el.calceranking,
 							y: el.calceranking,
 							label: candidates.find((elm) => elm.can_id === name[i]._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((el) => el.can_id === name[i]._idCandidato)
 						};
 					});
@@ -232,8 +231,8 @@ function TestSelection() {
 						return {
 							x: el.calceranking,
 							y: el.calceranking,
-							label: i + 1,
-							r: 10,
+							label: 1,
+							r: bubbleRadius,
 							name: candidates.find((elm) => {
 								return elm.can_id === data.flat().find((el) => el._idCandidato)._idCandidato;
 							})
@@ -247,14 +246,19 @@ function TestSelection() {
 
 			setPrint(true);
 			chartRef.current.update();
+		} else {
+			setPosition([]);
+			setPrint(false);
+			setSnackbar({...isSnackbar,open:true})
 		}
 		setGenerated((prev) => !prev);
 	};
 
+	// handle position
 	const handlePositionData = (data, xAxis, yAxis) => {
 		let positionX, positionY;
 
-		if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'apl' || xAxis === 'apl')) {
+		if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'apl' || xAxis === 'apl') && raziList !== '' && aplList !== '') {
 			let array;
 			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
 			positionX = data[1]
@@ -279,25 +283,25 @@ function TestSelection() {
 				if (aplRaziIndex === 0) {
 					array = positionY.map((el, i) => {
 						let raziValue = positionX.find((elm) => elm._idCandidato === el._idCandidato)._resultadofinal;
-						let razi = el.calceranking * (value.aplWeight / 100) + raziValue * (value.raziWeight / 100);
+						let aplAndRazi = el.calceranking * (value.aplWeight / 100) + raziValue * (value.raziWeight / 100);
 						return {
-							x: razi,
+							x: aplAndRazi,
 							y: el.calceranking,
 							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
 				} else {
 					array = positionY.map((el, i) => {
 						let raziValue = positionX.find((elm) => elm._idCandidato === el._idCandidato)._resultadofinal;
-						let razi = el.calceranking * (value.aplWeight / 100) + raziValue * (value.raziWeight / 100);
+						let aplAndRazi = el.calceranking * (value.aplWeight / 100) + raziValue * (value.raziWeight / 100);
 
 						return {
 							x: el.calceranking,
-							y: razi,
+							y: aplAndRazi,
 							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
@@ -322,7 +326,7 @@ function TestSelection() {
 							x: razi,
 							y: el.calceranking,
 							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
@@ -337,7 +341,7 @@ function TestSelection() {
 							x: el.calceranking,
 							y: razi,
 							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
+							r: bubbleRadius,
 							name: candidates.find((elm) => elm.can_id === el._idCandidato)
 						};
 					});
@@ -351,7 +355,7 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-		} else if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'razi' || xAxis === 'razi')) {
+		} else if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'razi' || xAxis === 'razi') && raziList !== '' && aplList !== '') {
 			let array;
 			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
 
@@ -378,23 +382,23 @@ function TestSelection() {
 					aplRaziIndex === 1
 						? positionX.map((el, i) => {
 							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+							let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
 							return {
 								x: el._resultadofinal,
-								y: apl,
+								y: aplAndRazi,
 								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: 10,
+								r: bubbleRadius,
 								name: candidates.find((elm) => elm.can_id === el._idCandidato)
 							};
 						})
 						: positionX.map((el, i) => {
 							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+							let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
 							return {
-								x: apl,
+								x: aplAndRazi,
 								y: el._resultadofinal,
 								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: 10,
+								r: bubbleRadius,
 								name: candidates.find((elm) => elm.can_id === el._idCandidato)
 							};
 						});
@@ -419,7 +423,7 @@ function TestSelection() {
 								x: el._resultadofinal,
 								y: apl,
 								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: 10,
+								r: bubbleRadius,
 								name: candidates.find((elm) => elm.can_id === el._idCandidato)
 							};
 						})
@@ -430,7 +434,7 @@ function TestSelection() {
 								x: apl,
 								y: el._resultadofinal,
 								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: 10,
+								r: bubbleRadius,
 								name: candidates.find((elm) => elm.can_id === el._idCandidato)
 							};
 						});
@@ -441,7 +445,7 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-		} else if ((xAxis === 'apl' || xAxis === 'razi') && (yAxis === 'razi' || yAxis === 'apl')) {
+		} else if ((xAxis === 'apl' || xAxis === 'razi') && (yAxis === 'razi' || yAxis === 'apl') && raziList !== '' && aplList !== '') {
 			let aplPosition = xAxis === 'apl' ? 0 : 1;
 			let raziPosition = xAxis === 'razi' ? 0 : 1;
 			positionY = data[raziPosition]
@@ -480,7 +484,7 @@ function TestSelection() {
 					x: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
 					y: el._resultadofinal,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			}) : positionY.map((el, i) => {
@@ -488,7 +492,7 @@ function TestSelection() {
 					x: el._resultadofinal,
 					y: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			});
@@ -497,7 +501,7 @@ function TestSelection() {
 				setPosition(array);
 			});
 			setPrint(true);
-		} else if ((xAxis === 'razi' || xAxis === 'performance') && (yAxis === 'performance' || yAxis === 'razi')) {
+		} else if ((xAxis === 'razi' || xAxis === 'performance') && (yAxis === 'performance' || yAxis === 'razi') && raziList !== '' && performanceList !== '') {
 			let raziPosition = xAxis === 'razi' ? 0 : 1;
 			let performancePosition = xAxis === 'performance' ? 0 : 1;
 			positionX = data[raziPosition]
@@ -524,7 +528,7 @@ function TestSelection() {
 					x: el._resultadofinal,
 					y: positionY[i].porcentaje,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			}) : positionX.map((el, i) => {
@@ -532,16 +536,17 @@ function TestSelection() {
 					x: positionY[i].porcentaje,
 					y: el._resultadofinal,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			});
-			console.log(array)
+
 			flushSync(() => {
 				setPosition(array);
 			});
 
 			setPrint(true);
+
 		} else if ((xAxis === 'apl' || xAxis === 'performance') && (yAxis === 'performance' || yAxis === 'apl')) {
 			let aplPosition = xAxis === 'apl' ? 0 : 1;
 			let performancePosition = xAxis === 'performance' ? 0 : 1;
@@ -594,7 +599,7 @@ function TestSelection() {
 					x: el.calceranking,
 					y: positionY[i].porcentaje,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			}) : positionX.map((el, i) => {
@@ -602,7 +607,7 @@ function TestSelection() {
 					x: positionY[i].porcentaje,
 					y: el.calceranking,
 					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: 10,
+					r: bubbleRadius,
 					name: candidates.find((elm) => elm.can_id === el._idCandidato)
 				};
 			});
@@ -612,6 +617,10 @@ function TestSelection() {
 			});
 
 			setPrint(true);
+		} else {
+			setPosition([]);
+			setPrint(false);
+			setSnackbar({...isSnackbar,open:true})
 		}
 		chartRef.current.update();
 		setGenerated((prev) => !prev);
@@ -647,7 +656,10 @@ function TestSelection() {
 				.then((data) => {
 					handlePositionData(data, xAxis, yAxis);
 				})
-				.catch((e) => setPrint(false));
+				.catch((e) => {
+					setPrint(false);
+					setPosition([]);
+				});
 	};
 
 	// handle apl and razi
@@ -655,62 +667,71 @@ function TestSelection() {
 		data
 			.then((response) => {
 				let razi, apl, array;
-				if (aplList.split(',').length > 1) {
-					razi = response[1]
-						.flat()
-						.flat()
-						.filter((el) => el._resultadofinal);
+				if (aplList !== '' && raziList !== '') {
+					if (aplList.split(',').length > 1) {
+						razi = response[1]
+							.flat()
+							.flat()
+							.filter((el) => el._resultadofinal);
 
-					apl = response[0].map((el, i, array) => {
-						return {
-							_idCandidato: array[i]
-								.flat()
-								.flat()
-								.find((el) => el._idCandidato)._idCandidato,
-							calceranking: array[i]
-								.flat()
-								.flat()
-								.find((el) => el.calceranking).calceranking
-						};
-					});
+						apl = response[0].map((el, i, array) => {
+							return {
+								_idCandidato: array[i]
+									.flat()
+									.flat()
+									.find((el) => el._idCandidato)._idCandidato,
+								calceranking: array[i]
+									.flat()
+									.flat()
+									.find((el) => el.calceranking).calceranking
+							};
+						});
 
-					array = razi.map((el, i) => {
-						let aplValue = apl.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-						let axis = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-						return {
-							x: axis,
-							y: axis,
-							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
-							name: candidates.find((elm) => elm.can_id === el._idCandidato)
-						};
+						array = razi.map((el, i) => {
+							let aplValue = apl.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
+							let axis = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+							return {
+								x: axis,
+								y: axis,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+						});
+					} else {
+						razi = response[1].flat().filter((el) => el._resultadofinal);
+						apl = response[0].flat().filter((el) => el.calceranking);
+						let obj = [{ ...apl[0], ...razi[0] }];
+						array = obj.map((el, i) => {
+							let axis = el.calceranking * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+							return {
+								x: axis,
+								y: axis,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find(
+									(elm) => elm.can_id === response[1].flat().find((el) => el._idCandidato)._idCandidato
+								)
+							};
+						});
+					}
+
+					flushSync(() => {
+						setPosition(array);
 					});
+					setPrint(true);
+					setGenerated((prev) => !prev);
+					chartRef.current.update();
 				} else {
-					razi = response[1].flat().filter((el) => el._resultadofinal);
-					apl = response[0].flat().filter((el) => el.calceranking);
-					let obj = [{ ...apl[0], ...razi[0] }];
-					array = obj.map((el, i) => {
-						let axis = el.calceranking * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-						return {
-							x: axis,
-							y: axis,
-							label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-							r: 10,
-							name: candidates.find(
-								(elm) => elm.can_id === response[1].flat().find((el) => el._idCandidato)._idCandidato
-							)
-						};
-					});
+					setPosition([]);
+					setPrint(false);
+					setSnackbar({...isSnackbar,open:true})
 				}
-
-				flushSync(() => {
-					setPosition(array);
-				});
-				setPrint(true);
-				setGenerated((prev) => !prev);
-				chartRef.current.update();
 			})
-			.catch((e) => setPrint(false));
+			.catch((e) => {
+				setPrint(false);
+				setPosition([]);
+			});
 	};
 
 	// handle position
@@ -728,11 +749,10 @@ function TestSelection() {
 		const url = '/get/' + xAxis + '?id=' + id;
 		// if same position
 		if (xAxis === yAxis) {
-			debugger
 			if (xAxis === 'apl' && (value.profile === '' || value.norm === '')) {
 				handleErrors();
-			}else if((xAxis === 'apl&razi' || yAxis === 'apl&razi' || xAxis === 'razi' || yAxis === 'razi') && value.norm === ''){
-        setValid({...isValid,norm:true});
+			} else if ((xAxis === 'apl&razi' || yAxis === 'apl&razi' || xAxis === 'razi' || yAxis === 'razi') && value.norm === '') {
+				setValid({ ...isValid, norm: true });
 			} else if (xAxis === 'apl&razi') {
 				let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
 				let razi = await fetch('/get/razi?id=' + id).then((response) => response.json());
@@ -740,7 +760,7 @@ function TestSelection() {
 				handleAplAndRazi(Promise.all([apl, razi]));
 			} else {
 				try {
-					setValid({...isValid,norm:false});
+					setValid({ ...isValid, norm: false });
 					id !== '' &&
 						(await fetch(url)
 							.then((response) => response.json())
@@ -752,12 +772,12 @@ function TestSelection() {
 					setPrint(false);
 				}
 			}
-		}else if ((xAxis === 'apl' || yAxis === 'apl') && (value.profile === '' || value.norm === '')) {
+		} else if ((xAxis === 'apl' || yAxis === 'apl') && (value.profile === '' || value.norm === '')) {
 			handleErrors();
-		}else if((xAxis === 'apl&razi' || yAxis === 'apl&razi' || xAxis === 'razi' || yAxis === 'razi') && value.norm === ''){
-			setValid({...isValid,norm:true});
+		} else if ((xAxis === 'apl&razi' || yAxis === 'apl&razi' || xAxis === 'razi' || yAxis === 'razi') && value.norm === '') {
+			setValid({ ...isValid, norm: true });
 		} else {
-			setValid({...isValid,norm:false});
+			setValid({ ...isValid, norm: false });
 			await handleNotEqualAxis(xAxis, yAxis);
 		}
 	};
@@ -843,7 +863,6 @@ function TestSelection() {
 									sx={{ textTransform: 'capitalize' }}
 									displayEmpty
 								>
-									<MenuItem value="">None</MenuItem>
 									{axis.map((el) => (
 										<MenuItem key={el.id} value={el.value} sx={{ textTransform: 'capitalize' }}>
 											{el.axis}
@@ -866,7 +885,6 @@ function TestSelection() {
 									onChange={(e) => handleChange(e)}
 									displayEmpty
 								>
-									<MenuItem value="">None</MenuItem>
 									{axis.map((el) => (
 										<MenuItem key={el.id} value={el.value} sx={{ textTransform: 'capitalize' }}>
 											{el.axis}
@@ -897,7 +915,7 @@ function TestSelection() {
 									))}
 								</Select>
 								<FormHelperText error sx={{ visibility: isValid.profile ? 'visible' : 'hidden' }}>
-									Profile is required field.
+									The profile is a required field with the APL test.
 								</FormHelperText>
 							</FormControl>
 						</Grid>
@@ -1157,10 +1175,12 @@ function TestSelection() {
 							{isPrint && (
 								<Button
 									variant="contained"
-									sx={{ ml: 5,
+									sx={{
+										ml: 5,
 										'@media print and (min-width: 320px)': {
-							 display:'none',
-								}, }}
+											display: 'none',
+										},
+									}}
 									onClick={() => {
 										flushSync(() => {
 											chartRef.current.resize();
@@ -1174,7 +1194,7 @@ function TestSelection() {
 						</Grid>
 						<Grid item xs={12} lg={3} marginBottom={3}>
 							<FormControl fullWidth>
-								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={1}>
+								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={4}>
 									Selected List
 								</Box>
 								<Table data={candidates} />
@@ -1200,7 +1220,14 @@ function TestSelection() {
 							<Chart />
 						</Grid>
 					</Grid>
-
+					<Snackbar
+						anchorOrigin={{ vertical, horizontal }}
+						open={open}
+						autoHideDuration={4000}
+						message="No matching result found!"
+						onClose={() => setSnackbar({...isSnackbar,open:false})}
+						key={vertical + horizontal}
+					/>
 					{/* grid */}
 				</Container>
 			</Box>
