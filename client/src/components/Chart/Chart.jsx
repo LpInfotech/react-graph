@@ -12,12 +12,12 @@ import { Stack } from '@mui/material';
 ChartJS.register(LinearScale, PointElement, Legend, Tooltip, ChartDataLabels);
 
 const BarChart = memo(
-	forwardRef(function BarChart({ value, bubblePosition, colors }, ref) {
+	forwardRef(function BarChart({ value, bubblePosition }, ref) {
 		const initialData = {
 			datasets: [
 				{
 					type: 'bubble',
-					backgroundColor: colors,
+					backgroundColor: '#455a64',
 					borderWidth: 1,
 					fill: false,
 					data: bubblePosition
@@ -35,13 +35,17 @@ const BarChart = memo(
 					setData(initialData);
 					chartRef.current.update();
 				},
-				print() {
-					triggerHover(chartRef.current);
-				},
 				resize() {
 					chartRef?.current.resize(750, 760);
 				}
 			};
+		});
+
+		// after print
+		window.addEventListener('beforeprint', () => {
+			if (chartRef.current !== null) {
+				chartRef?.current.resize(750,750);
+			}
 		});
 
 		// after print
@@ -51,20 +55,6 @@ const BarChart = memo(
 			}
 		});
 
-		// trigger hover
-		function triggerHover(chart) {
-			// const tooltip = chart?.tooltip;
-			// if (tooltip.getActiveElements().length > 0) {
-			// 	tooltip.setActiveElements([]);
-			// } else {
-			// 	tooltip.setActiveElements(
-			// 		bubblePosition.map((el, i) => {
-			// 			return { datasetIndex: 0, index: i };
-			// 		})
-			// 	);
-			// }
-			// chart.update();
-		}
 
 		// div element
 		const Div = styled('div')(({ theme }) => ({
@@ -98,17 +88,16 @@ const BarChart = memo(
 						<Box
 							display={'grid'}
 							sx={{
-								gridTemplateColumns: `${Number(value.xLow) + '%'} ${Number(value.xAverage) + '%'} ${
-							Number(value.xHigh) + '%'
-						}`,
+								gridTemplateColumns: `${Number(value.xLow) + '%'} ${Number(value.xAverage) + '%'} ${Number(value.xHigh) + '%'
+									}`,
 								width: '100%'
 							}}
 						>
 							<Box>
 								<Div
 									sx={{
-										width: Number(value.xLow)+'%',
-										height: Number(value.yLow)+'%',
+										width: Number(value.xLow) + '%',
+										height: Number(value.yLow) + '%',
 										bottom: 0,
 										justifyContent: 'flex-start',
 										alignItems: 'center',
@@ -119,18 +108,18 @@ const BarChart = memo(
 											position: 'absolute',
 											left: '-32px',
 											transform: 'rotate(-90deg)',
-										 display: Number(value.yLow) === 0 ? 'none' : ''
+											display: Number(value.yLow) === 0 ? 'none' : ''
 										},
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 										backgroundColor: red[300]
 									}}
 								></Div>
 								<Div
 									sx={{
-										width: Number(value.xLow)+'%',
-										height: Number(value.yAverage)+'%',
-										bottom: Number(value.yLow)+'%',
+										width: Number(value.xLow) + '%',
+										height: Number(value.yAverage) + '%',
+										bottom: Number(value.yLow) + '%',
 										zIndex: 1,
 										alignItems: 'center',
 										pl: 1,
@@ -144,14 +133,14 @@ const BarChart = memo(
 											display: Number(value.yAverage) === 0 ? 'none' : ''
 										},
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 								<Div
 									bottom={Number(value.yAverage) + Number(value.yLow) + '%'}
 									sx={{
-										width: Number(value.xLow)+'%',
-										height: Number(value.yHigh)+'%',
+										width: Number(value.xLow) + '%',
+										height: Number(value.yHigh) + '%',
 										zIndex: 1,
 										alignItems: 'center',
 										pl: 1,
@@ -162,49 +151,49 @@ const BarChart = memo(
 											position: 'absolute',
 											left: '-35px',
 											transform: 'rotate(-90deg)',
-									  display: Number(value.yHigh) === 0 ? 'none' : ''
+											display: Number(value.yHigh) === 0 ? 'none' : ''
 										},
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 							</Box>
 							<Box>
 								<Div
 									sx={{
-										width: Number(value.xAverage)+'%',
-										height: Number(value.yLow)+'%',
+										width: Number(value.xAverage) + '%',
+										height: Number(value.yLow) + '%',
 										bottom: '0',
 										zIndex: 1,
 										alignItems: 'center',
 										backgroundColor: orange.A200,
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 								<Div
 									sx={{
-										width: Number(value.xAverage)+'%',
-										height: Number(value.yAverage)+'%',
-										bottom:Number(value.yLow)+'%',
+										width: Number(value.xAverage) + '%',
+										height: Number(value.yAverage) + '%',
+										bottom: Number(value.yLow) + '%',
 										justifyContent: 'flex-start',
 										alignItems: 'center',
 										zIndex: Number(value.xLow) === 0 ? 1 : '',
 										backgroundColor: orange[500],
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 								<Div
 									sx={{
-										bottom:Number(value.yAverage) + Number(value.yLow) + '%',
-										width: Number(value.xAverage)+'%',
-										height: Number(value.yHigh)+'%',
+										bottom: Number(value.yAverage) + Number(value.yLow) + '%',
+										width: Number(value.xAverage) + '%',
+										height: Number(value.yHigh) + '%',
 										zIndex: 1,
 										alignItems: 'center',
 										backgroundColor: yellow[200],
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								>
 								</Div>
@@ -213,38 +202,38 @@ const BarChart = memo(
 								<Div
 									sx={{
 										bottom: 0,
-										width: Number(value.xHigh)+'%',
-										height: Number(value.yLow)+'%',
+										width: Number(value.xHigh) + '%',
+										height: Number(value.yLow) + '%',
 										zIndex: 1,
 										alignItems: 'center',
 										backgroundColor: yellow.A100,
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 								<Div
 									sx={{
-										width: Number(value.xHigh)+'%',
-										height: Number(value.yAverage)+'%',
-										bottom: Number(value.yLow)+'%',
+										width: Number(value.xHigh) + '%',
+										height: Number(value.yAverage) + '%',
+										bottom: Number(value.yLow) + '%',
 										zIndex: 1,
 										alignItems: 'center',
 										backgroundColor: lightGreen.A100,
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 								<Div
 									sx={{
-										width: Number(value.xHigh)+'%',
-										height: Number(value.yHigh)+'%',
-										bottom: Number(value.yLow) + Number(value.yAverage)+'%',
+										width: Number(value.xHigh) + '%',
+										height: Number(value.yHigh) + '%',
+										bottom: Number(value.yLow) + Number(value.yAverage) + '%',
 										justifyContent: 'flex-start',
 										alignItems: 'center',
 										zIndex: Number(value.xLow) === 0 ? 1 : '',
 										backgroundColor: lightGreen[300],
 										printColorAdjust: 'exact',
-										WebkitPrintColorAdjust:'exact',
+										WebkitPrintColorAdjust: 'exact',
 									}}
 								></Div>
 							</Box>

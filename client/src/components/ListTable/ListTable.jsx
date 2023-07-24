@@ -12,12 +12,12 @@ export default function BasicTable({data}) {
   const rows = data.map((el)=>{return{index:el.index,name:el.can_nombre + ' ' + el.can_apellido}})
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{border: '1px solid', borderColor: (theme)=> theme.palette.grey[300]}}>
       <Table aria-label="List table">
         <TableHead>
           <TableRow>
-            <TableCell>Index</TableCell>
-            <TableCell>Name</TableCell>
+            <TableCell sx={{fontWeight:700}}>Index</TableCell>
+            <TableCell sx={{fontWeight:700}}>Name</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -26,7 +26,7 @@ export default function BasicTable({data}) {
               key={row.index}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" sx={{fontWeight:700}}>
                 {row.index}
               </TableCell>
               <TableCell>{row.name}</TableCell>

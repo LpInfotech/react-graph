@@ -104,6 +104,7 @@ const server = http.createServer(async function (req, res) {
 		//  get internal candidate with query string
 		case parseUrl.pathname === '/get/performance' && req.method === 'GET':
 			{
+				if(parseUrl.query.id.split(',').length === 1){
 				fs.readFile(
 					__dirname +
 						`/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${parseUrl.query.id}.json`,
@@ -117,6 +118,21 @@ const server = http.createServer(async function (req, res) {
 						res.end(data);
 					}
 				);
+				}else{
+					let arr = [];
+					parseUrl.query.id.split(',').forEach((el,i,array) => { 
+
+					fs.promises.readFile(__dirname + `/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${el}.json`,
+							'utf8',).then(function (result) {
+							arr.push(JSON.parse(result));
+							if(arr.length === array.length){
+								res.end(JSON.stringify(arr))
+							}
+					}).catch(function (error) {
+							console.log(error);
+					})
+				})
+				}
 			}
 
 			break;

@@ -9,7 +9,7 @@ module.exports = {
       mode: 'nearest'
     },
     layout: {
-      autoPadding: false,
+      autoPadding: true,
     },
     plugins: {
       datalabels: {
@@ -30,7 +30,7 @@ module.exports = {
       tooltip: {
         callbacks: {
           label: (tooltipItems) => {
-            return (tooltipItems.raw?.label + ". " + tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
+            return (tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
           }
         }
       }
@@ -38,18 +38,12 @@ module.exports = {
     scales: {
       x: {
         title: { display: false, },
-        beginAtZero: true,
         min: 0,
         grid: {
           display: false,
-          drawOnChartArea: false,
-          drawBorder: false,
-          drawTicks: false,
-          lineWidth: 0,
-          textStrokeWidth: 0
         },
         ticks: {
-          display: false
+          display:false
         },
         border: {
           display: false,
@@ -61,11 +55,6 @@ module.exports = {
         min: 0,
         grid: {
           display: false,
-          drawOnChartArea: false,
-          drawBorder: false,
-          drawTicks: false,
-          lineWidth: 0,
-          textStrokeWidth: 0
         },
         border: {
           display: false,
