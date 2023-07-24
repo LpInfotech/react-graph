@@ -1,14 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Container from '@mui/material/Container';
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
-import { FormHelperText } from '@mui/material';
+import { FormHelperText,Box,Grid,Button,Typography,Container,FormControl,Select, MenuItem} from '@mui/material';
 import BarChart from '../../components/Chart/Chart';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
@@ -88,6 +80,13 @@ function TestSelection() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[isGenerated]
 	);
+
+	if(value.candidates.length === 0 && candidates.length > 0){
+		let selected = candidates.map((el) => el.index +'. '+ el.can_nombre + ' ' + el.can_apellido);
+		setValue((prev) => {
+			return { ...prev, candidates: selected };
+		});
+	}
 
 	const aplList = [
 		...new Set(
@@ -1173,7 +1172,7 @@ function TestSelection() {
 								</Button>
 							)}
 						</Grid>
-						<Grid item xs={12} lg={4} marginBottom={3}>
+						<Grid item xs={12} lg={3} marginBottom={3}>
 							<FormControl fullWidth>
 								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={1}>
 									Selected List
@@ -1183,7 +1182,8 @@ function TestSelection() {
 						</Grid>
 						<Grid
 							item
-							lg={8}
+							lg={9}
+							xs={12}
 							sx={{
 								mb: 10,
 								mt: 4,

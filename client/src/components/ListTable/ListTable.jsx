@@ -8,11 +8,12 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 
+
 export default function BasicTable({data}) {
   const rows = data.map((el)=>{return{index:el.index,name:el.can_nombre + ' ' + el.can_apellido}})
 
   return (
-    <TableContainer component={Paper} sx={{border: '1px solid', borderColor: (theme)=> theme.palette.grey[300]}}>
+    <TableContainer component={Paper} sx={{border: '1px solid', borderColor: (theme)=> theme.palette.grey[300],maxHeight: '500px'}}>
       <Table aria-label="List table">
         <TableHead>
           <TableRow>
