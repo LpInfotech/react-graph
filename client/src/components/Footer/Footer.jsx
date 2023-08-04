@@ -6,7 +6,7 @@ function Footer() {
 
 
   return (
-    <Box
+    <Box displayPrint={"none"}
       component="footer"
       sx={{
         borderTop: (theme) => `1px solid ${theme.palette.divider}`,

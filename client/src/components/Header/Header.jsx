@@ -29,7 +29,7 @@ function DrawerAppBar({ window, title }) {
   );
 
   return (
-    <Box component="header" sx={{ display: 'flex' }}>
+    <Box component="header" sx={{ display: 'flex' }} displayPrint={"none"}>
       <AppBar component="nav" sx={{
         printColorAdjust: 'exact',
         WebkitPrintColorAdjust: 'exact',

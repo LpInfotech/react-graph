@@ -20,7 +20,7 @@ module.exports = {
         },
         color: (context, args) => {
           return '#fff';
-        }
+        },
       },
       legend: {
         display: false
@@ -31,7 +31,7 @@ module.exports = {
       tooltip: {
         callbacks: {
           label: (tooltipItems) => {
-            return (tooltipItems.raw?.name?.can_nombre) || tooltipItems.raw?.label;
+            return (tooltipItems.raw?.name?.can_nombre +" " +tooltipItems.raw?.name?.can_apellido) || tooltipItems.raw?.label;
           }
         }
       }
@@ -39,12 +39,12 @@ module.exports = {
     scales: {
       x: {
         title: { display: false, },
-        min: 0,
+        beginAtZero: true,
         grid: {
           display: false,
         },
         ticks: {
-          display:false
+          display: false,
         },
         border: {
           display: false,
@@ -53,7 +53,6 @@ module.exports = {
       y: {
         beginAtZero: true,
         title: { display: false, },
-        min: 0,
         grid: {
           display: false,
         },
@@ -61,7 +60,7 @@ module.exports = {
           display: false,
         },
         ticks: {
-          display: false
+          display: false,
         }
       }
     }

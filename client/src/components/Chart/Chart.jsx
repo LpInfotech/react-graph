@@ -12,7 +12,7 @@ import { Stack } from '@mui/material';
 ChartJS.register(LinearScale, PointElement, Legend, Tooltip, ChartDataLabels);
 
 const BarChart = memo(
-	forwardRef(function BarChart({ value, bubblePosition }, ref) {
+	forwardRef(function BarChart({ value, bubblePosition}, ref) {
 		const initialData = {
 			datasets: [
 				{
@@ -36,15 +36,15 @@ const BarChart = memo(
 					chartRef.current.update();
 				},
 				resize() {
-					chartRef?.current.resize(750, 760);
+					chartRef?.current.resize(750, 750)
 				}
 			};
 		});
 
-		// after print
+		// before print
 		window.addEventListener('beforeprint', () => {
 			if (chartRef.current !== null) {
-				chartRef?.current.resize(750,750);
+		chartRef?.current.resize(750, 750)
 			}
 		});
 
@@ -73,15 +73,17 @@ const BarChart = memo(
 					<Box
 						position={'relative'}
 						sx={{
+							overflow:'hidden',
 							mx: 'auto',
-							width: '100%',
 							height: '100%',
+							width: '100%',
 							'@media screen and (max-width:576px)': {
 								fontSize: '13px'
 							},
 							'@media print and (min-width: 320px)': {
 								marginTop: '80px',
-								fontSize: '14px'
+								fontSize: '14px',
+								width:'98.6%'
 							}
 						}}
 					>
