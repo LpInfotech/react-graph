@@ -21,8 +21,8 @@ function TestSelection() {
 		xAxis: 'razi',
 		yAxis: 'razi',
 		profile: '',
-		raziNorm: '',
-		aplNorm:'',
+		raziNorm: 'Norma Estandar',
+		aplNorm: '',
 		candidates: [],
 		xLow: 25,
 		xAverage: 25,
@@ -38,8 +38,7 @@ function TestSelection() {
 
 	const [isValid, setValid] = useState({
 		profile: false,
-		raziNorm: false,
-		aplNorm:false,
+		aplNorm: false,
 		chartError: false,
 		horizontalChartError: false,
 		verticalChartError: false
@@ -121,15 +120,14 @@ function TestSelection() {
 	// set validation
 	if (isValid.profile && value.profile !== '') setValid({ ...isValid, profile: false });
 	else if (isValid.aplNorm && value.aplNorm !== '') setValid({ ...isValid, aplNorm: false });
-	else if (isValid.raziNorm && value.raziNorm !== '') setValid({ ...isValid, raziNorm: false });
-	else if (value.xAxis === 'performance' && value.yAxis === 'performance' && (isValid.aplNorm || isValid.profile || isValid.raziNorm)) {
-		setValid({...isValid, aplNorm: false, profile: false ,raziNorm:false});
+	else if (value.xAxis === 'performance' && value.yAxis === 'performance' && (isValid.aplNorm || isValid.profile)) {
+		setValid({ ...isValid, aplNorm: false, profile: false });
+	} else if (value.xAxis === 'razi' && value.yAxis === 'razi' && (isValid.aplNorm || isValid.profile)) {
+		setValid({ ...isValid, profile: false, aplNorm: false });
 	}
-	else {
-		if ((isValid.profile || isValid.aplNorm || isValid.raziNorm) &&(value.xAxis === 'performance' && value.yAxis === 'performance')) {
-			setValid({ ...isValid,profile: false, aplNorm: false });
-		}
-	}
+	else if ((isValid.profile || isValid.aplNorm) && ((value.xAxis === 'performance' && value.yAxis === 'razi') || (value.xAxis === 'razi' && value.yAxis === 'performance'))) {
+		setValid({ ...isValid, profile: false, aplNorm: false });
+	} 
 
 	// #end region
 
@@ -146,7 +144,6 @@ function TestSelection() {
 			chartConfig.layout.autoPadding = true;
 			delete chartConfig.scales.x.max;
 			delete chartConfig.scales.y.max;
-			console.log(chartConfig)
 		}
 	}
 
@@ -674,37 +671,37 @@ function TestSelection() {
 						: (xAxis) === 'apl&razi'
 							? aplList
 							: '';
-							const yId =
-							(yAxis) === 'apl'
-								? aplList
-								: (yAxis) === 'performance'
-									? performanceList
-									: yAxis === 'razi'
-										? raziList
-										: (yAxis) === 'apl&razi'
-											? aplList
-											: '';
+		const yId =
+			(yAxis) === 'apl'
+				? aplList
+				: (yAxis) === 'performance'
+					? performanceList
+					: yAxis === 'razi'
+						? raziList
+						: (yAxis) === 'apl&razi'
+							? aplList
+							: '';
 		let xPosition, yPosition;
-		try{
-		// check if test include the apl+razi
-		if(xId !== "" && yId !== ""){
-		if (
-			(xAxis === 'apl&razi' && (yAxis === 'razi' || yAxis === 'apl' || yAxis === 'performance')) ||
-			(yAxis === 'apl&razi' && (xAxis === 'razi' || xAxis === 'apl' || xAxis === 'performance')) 
-		) {
-			xPosition = await fetch('/get/apl?id=' + xId).then((response) => response.json());
-			yPosition = await fetch('/get/razi?id=' + yId).then((response) => response.json());
-		} else {
-			// if another test selected
-			xPosition = await fetch('/get/' + xAxis + '?id=' + xId).then((response) => response.json());
-			yPosition = await fetch('/get/' + yAxis + '?id=' + yId).then((response) => response.json());
-		}
-	}else{
-		setPrint(false);
-		setPosition([]);
-		setSnackbar({ ...isSnackbar, open: true })
-	}
-		}catch(e){
+		try {
+			// check if test include the apl+razi
+			if (xId !== "" && yId !== "") {
+				if (
+					(xAxis === 'apl&razi' && (yAxis === 'razi' || yAxis === 'apl' || yAxis === 'performance')) ||
+					(yAxis === 'apl&razi' && (xAxis === 'razi' || xAxis === 'apl' || xAxis === 'performance'))
+				) {
+					xPosition = await fetch('/get/apl?id=' + xId).then((response) => response.json());
+					yPosition = await fetch('/get/razi?id=' + yId).then((response) => response.json());
+				} else {
+					// if another test selected
+					xPosition = await fetch('/get/' + xAxis + '?id=' + xId).then((response) => response.json());
+					yPosition = await fetch('/get/' + yAxis + '?id=' + yId).then((response) => response.json());
+				}
+			} else {
+				setPrint(false);
+				setPosition([]);
+				setSnackbar({ ...isSnackbar, open: true })
+			}
+		} catch (e) {
 			setPrint(false);
 			setPosition([]);
 			setSnackbar({ ...isSnackbar, open: true })
@@ -809,89 +806,79 @@ function TestSelection() {
 							: '';
 		const url = '/get/' + xAxis + '?id=' + id;
 
-		if(id !== ""){
-		// if same position
-		if (xAxis === yAxis) {
-			if (xAxis === 'apl' && (value.profile === '' || value.aplNorm === '')) {
-				handleErrors();
-			} else if ((xAxis === 'apl&razi') && (value.profile === '' || value.aplNorm === '' || value.raziNorm === '')) {
-				handleAplRaziErrors();
-			}else if((xAxis === 'razi') && value.raziNorm ===''){
-				setValid({...isValid,raziNorm:true,profile:false,aplNorm:false})
-	        } else if (xAxis === 'apl&razi') {
-				let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
-				let razi = await fetch('/get/razi?id=' + id).then((response) => response.json());
-				Promise.all([apl, razi]);
-				handleAplAndRazi(Promise.all([apl, razi]));
-			} else {
-				try {
-					setValid({ ...isValid, raziNorm: false,aplNorm:false });
-					id !== '' &&
-						(await fetch(url)
-							.then((response) => response.json())
-							.then((data) => {
-								handleEqualAxis(xAxis, data);
-							}));
-				} catch (e) {
-					console.log(e);
-					setPrint(false);
+		if (id !== "") {
+			// if same position
+			if (xAxis === yAxis) {
+				if (xAxis === 'apl' && (value.profile === '' || value.aplNorm === '')) {
+					handleErrors();
+				} else if ((xAxis === 'apl&razi') && (value.profile === '' || value.aplNorm === '')) {
+					handleAplRaziErrors();
+				} else if (xAxis === 'apl&razi') {
+					let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
+					let razi = await fetch('/get/razi?id=' + id).then((response) => response.json());
+					Promise.all([apl, razi]);
+					handleAplAndRazi(Promise.all([apl, razi]));
+				} else {
+					try {
+						setValid({ ...isValid, aplNorm: false });
+						id !== '' &&
+							(await fetch(url)
+								.then((response) => response.json())
+								.then((data) => {
+									handleEqualAxis(xAxis, data);
+								}));
+					} catch (e) {
+						console.log(e);
+						setPrint(false);
+					}
 				}
+			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'razi' || yAxis === 'razi')) &&
+				(value.profile === '' || value.aplNorm === '')) {
+				handleAplRaziErrors();
+			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
+				(value.profile === '' || value.aplNorm === '')) {
+				handleAplRaziErrors();
+			} else if (((xAxis === 'razi' || yAxis === 'razi') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
+				(value.profile === '' || value.aplNorm === '')) {
+				handleAplRaziErrors();
+			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'performance' || yAxis === 'performance')) && (value.profile === '' || value.aplNorm === '')) {
+				handleErrors();
+			} else if (((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (xAxis === 'performance' || yAxis === 'performance')) && (value.profile === '' || value.aplNorm === '')) {
+				handleAplRaziErrors();
 			}
-		} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'razi' || yAxis === 'razi')) &&
-		(value.profile === '' || value.aplNorm === '' || value.raziNorm === '')) {
-			handleAplRaziErrors();
-		} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
-		(value.profile === '' || value.aplNorm === '' || value.raziNorm === '')) {
-			handleAplRaziErrors();
-		} else if (((xAxis === 'razi' || yAxis === 'razi') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
-		(value.profile === '' || value.aplNorm === '' || value.raziNorm === '')) {
-			handleAplRaziErrors();
-		} else if(((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'performance' || yAxis === 'performance'))&& (value.profile === '' || value.aplNorm === '')){
-			handleErrors();
-		}else if(((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (xAxis === 'performance' || yAxis === 'performance'))&& (value.profile === '' || value.aplNorm === '' || value.raziNorm === '')){
-			handleAplRaziErrors();
-		}else if(((xAxis === 'razi' || yAxis === 'razi') && (xAxis === 'performance' || yAxis === 'performance'))&& (value.raziNorm === '')){
-			setValid({...isValid,raziNorm:true});
+			else {
+				setValid({ ...isValid, aplNorm: false, profile: false });
+				await handleNotEqualAxis(xAxis, yAxis);
+			}
 		}
 		else {
-			setValid({ ...isValid, aplNorm: false,raziNorm:false,profile:false });
-			await handleNotEqualAxis(xAxis, yAxis);
+			setPosition([]);
+			setPrint(false);
+			setSnackbar({ ...isSnackbar, open: true })
 		}
-	}
-	else{
-		setPosition([]);
-		setPrint(false);
-		setSnackbar({ ...isSnackbar, open: true })
-	}
 
 	};
 
 	// handle errors
 	const handleErrors = () => {
 		if (value.profile === '' && value.aplNorm === '') {
-			setValid(isValid=>{return{...isValid, profile: true, aplNorm: true ,raziNorm:false}});
+			setValid(isValid => { return { ...isValid, profile: true, aplNorm: true } });
 		} else if (value.profile === '') {
-			setValid({ ...isValid, profile: true ,raziNorm:false});
+			setValid({ ...isValid, profile: true });
 		} else if (value.aplNorm === '') {
-			setValid({ ...isValid, aplNorm: true,raziNorm:false});
+			setValid({ ...isValid, aplNorm: true });
 		}
 	};
 
-	const handleAplRaziErrors =()=>{
-		if(value.profile === '' && value.aplNorm === '' && value.raziNorm === ''){
-			setValid({ ...isValid, aplNorm: true,raziNorm: true,profile:true})
-		}else if(value.profile === '' && value.aplNorm === ''){
-			setValid({ ...isValid, aplNorm: true,profile:true,raziNorm:false})
-		}else if(value.aplNorm === '' && value.raziNorm === ''){
-			setValid({ ...isValid, aplNorm: true,raziNorm: true,profile:false})
-		}else if(value.profile === '' && value.raziNorm === ''){
-			setValid({ ...isValid, aplNorm: false,raziNorm: true,profile:true})
-		}else if(value.profile === ''){
-			setValid({ ...isValid, profile:true})
-		}else if(value.aplNorm === ''){
-			setValid({ ...isValid, aplNorm:true})
-		}else if(value.raziNorm === ''){
-			setValid({ ...isValid, raziNorm:true})
+	const handleAplRaziErrors = () => {
+		if (value.profile === '' && value.aplNorm === '') {
+			setValid({ ...isValid, aplNorm: true, profile: true })
+		} else if (value.profile === '' && value.aplNorm === '') {
+			setValid({ ...isValid, aplNorm: true, profile: true })
+		} else if (value.profile === '') {
+			setValid({ ...isValid, profile: true })
+		} else if (value.aplNorm === '') {
+			setValid({ ...isValid, aplNorm: true })
 		}
 	}
 
@@ -1048,14 +1035,14 @@ function TestSelection() {
 									))}
 								</Select>
 								<FormHelperText error sx={{ visibility: isValid.aplNorm ? 'visible' : 'hidden' }}>
-								Apl Norm is required field.
+									Apl Norm is required field.
 								</FormHelperText>
 							</FormControl>
 						</Grid>
 						<Grid item xs={12} md={3} sm={6} displayPrint={'none'}>
 							<FormControl fullWidth>
 								<Box id="normLabel" fontWeight={600} textTransform="capitalize">
-							razi norm
+									razi norm
 								</Box>
 								<Select
 									labelId="normLabel"
@@ -1064,7 +1051,6 @@ function TestSelection() {
 									name="raziNorm"
 									onChange={(e) => handleChange(e)}
 									displayEmpty
-									error={isValid.raziNorm}
 								>
 									<MenuItem value="">None</MenuItem>
 									{routeData[2][0].response[0].map((el) => (
@@ -1073,9 +1059,6 @@ function TestSelection() {
 										</MenuItem>
 									))}
 								</Select>
-								<FormHelperText error sx={{ visibility: isValid.raziNorm ? 'visible' : 'hidden' }}>
-									Razi norm is required field.
-								</FormHelperText>
 							</FormControl>
 						</Grid>
 						{(value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') && (
@@ -1290,12 +1273,12 @@ function TestSelection() {
 						<Grid item xs={12} displayPrint={'none'} textAlign="right" sx={{ my: 4 }}>
 							<Button
 								variant="contained"
-								disabled={isValid.raziNorm || isValid.profile || isValid.aplNorm || ((value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') && (Number(value.aplWeight) + Number(value.raziWeight) !== 100))}
+								disabled={isValid.profile || isValid.aplNorm || ((value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') && (Number(value.aplWeight) + Number(value.raziWeight) !== 100))}
 								onClick={(e) => getPosition(value.xAxis, value.yAxis)}
 							>
 								Generate
 							</Button>
-							{(isPrint && !isValid.profile && !isValid.aplNorm && !isValid.raziNorm) && (
+							{(isPrint && !isValid.profile && !isValid.aplNorm) && (
 								<Button
 									variant="contained"
 									sx={{
