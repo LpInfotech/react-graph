@@ -816,7 +816,9 @@ function TestSelection() {
 				handleErrors();
 			} else if ((xAxis === 'apl&razi') && (value.profile === '' || value.aplNorm === '' || value.raziNorm === '')) {
 				handleAplRaziErrors();
-			} else if (xAxis === 'apl&razi') {
+			}else if((xAxis === 'razi') && value.raziNorm ===''){
+				setValid({...isValid,raziNorm:true,profile:false,aplNorm:false})
+	        } else if (xAxis === 'apl&razi') {
 				let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
 				let razi = await fetch('/get/razi?id=' + id).then((response) => response.json());
 				Promise.all([apl, razi]);
@@ -855,7 +857,8 @@ function TestSelection() {
 			setValid({ ...isValid, aplNorm: false,raziNorm:false,profile:false });
 			await handleNotEqualAxis(xAxis, yAxis);
 		}
-	}else{
+	}
+	else{
 		setPosition([]);
 		setPrint(false);
 		setSnackbar({ ...isSnackbar, open: true })
