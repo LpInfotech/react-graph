@@ -73,7 +73,6 @@ const BarChart = memo(
 					<Box
 						position={'relative'}
 						sx={{
-							overflow:'hidden',
 							mx: 'auto',
 							height: '100%',
 							width: '100%',
