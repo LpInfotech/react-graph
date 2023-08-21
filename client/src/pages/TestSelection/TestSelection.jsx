@@ -1291,7 +1291,7 @@ function TestSelection() {
 										flushSync(() => {
 											chartRef.current.resize();
 										});
-										setTimeout(() => window.print(), 450);
+										setTimeout(() => window.print(), 500);
 									}}
 								>
 									Print
