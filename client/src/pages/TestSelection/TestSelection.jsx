@@ -1330,7 +1330,7 @@ function TestSelection() {
 						anchorOrigin={{ vertical, horizontal }}
 						open={open}
 						autoHideDuration={4000}
-						message="No matching result found!"
+						message="No matching results found!"
 						onClose={() => setSnackbar({ ...isSnackbar, open: false })}
 						key={vertical + horizontal}
 					/>
