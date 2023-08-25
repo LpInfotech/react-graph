@@ -36,7 +36,7 @@ const BarChart = memo(
 					chartRef.current.update();
 				},
 				resize() {
-					chartRef?.current.resize(750, 750)
+					chartRef?.current.resize(660, 750)
 				}
 			};
 		});
@@ -44,7 +44,7 @@ const BarChart = memo(
 		// before print
 		window.addEventListener('beforeprint', () => {
 			if (chartRef.current !== null) {
-		chartRef?.current.resize(750, 750)
+		chartRef?.current.resize(660, 750);
 			}
 		});
 
@@ -82,7 +82,7 @@ const BarChart = memo(
 							'@media print and (min-width: 320px)': {
 								marginTop: '80px',
 								fontSize: '14px',
-								width:'98.6%'
+								width:'660px'
 							}
 						}}
 					>
