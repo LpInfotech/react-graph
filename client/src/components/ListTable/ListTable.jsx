@@ -42,7 +42,7 @@ export default function BasicTable({ data, xOmmited, yOmmited }) {
 							</TableCell>
 							<TableCell
 								sx={{
-									color: result.map((i) => (i.can_id === row.can_id ? 'yellow' : ''))
+									color: result.map((i) => (i.can_id === row.can_id ? 'red' : ''))
 								}}
 							>
 								{row.name}
