@@ -37,6 +37,7 @@ const BarChart = memo(
 				},
 				resize() {
 					chartRef?.current.resize(660, 750)
+					setTimeout(() => window.print(), 1000);
 				}
 			};
 		});

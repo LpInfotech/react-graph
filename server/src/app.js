@@ -39,19 +39,19 @@ const server = http.createServer(async function (req, res) {
 			});
 		}
 
-			// get normal Apl
-			case parseUrl.pathname === '/get/normaRazi' && req.method === 'GET': {
-				return fs.readFile(__dirname + '/db/SP_NormaRazi.json', 'utf8', function (err, data) {
-					if (err) {
-						console.log('File read failed:', err);
-						res.writeHead(500, { 'Content-Type': 'application/json' });
-						res.end(err);
-						throw new Error('File read failed');
-					}
-					res.writeHead(200, { 'Content-Type': 'application/json' });
-					res.end(data);
-				});
-			}
+		// get normal Apl
+		case parseUrl.pathname === '/get/normaRazi' && req.method === 'GET': {
+			return fs.readFile(__dirname + '/db/SP_NormaRazi.json', 'utf8', function (err, data) {
+				if (err) {
+					console.log('File read failed:', err);
+					res.writeHead(500, { 'Content-Type': 'application/json' });
+					res.end(err);
+					throw new Error('File read failed');
+				}
+				res.writeHead(200, { 'Content-Type': 'application/json' });
+				res.end(data);
+			});
+		}
 
 		//  get profiles
 		case parseUrl.pathname === '/get/profiles' && req.method === 'GET': {
@@ -104,39 +104,42 @@ const server = http.createServer(async function (req, res) {
 		//  get internal candidate with query string
 		case parseUrl.pathname === '/get/performance' && req.method === 'GET':
 			{
-		
-				if(parseUrl.query.id === ''){
-					res.end({message:"No record found!"})
-				}else if(parseUrl.query.id !== '' && parseUrl.query.id.split(',').length === 1){
-				fs.readFile(
-					__dirname +
-						`/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${parseUrl.query.id}.json`,
-					'utf8',
-					function (err, data) {
-						if (err) {
-							console.log('File read failed:', err);
-							throw new Error('File read failed');
-						}
-						res.writeHead(200, { 'Content-Type': 'application/json' });
-						console.log(data)
-						res.end(data);
-					}
-				);
-				}else{
-					console.log('tester')
-					let arr = [];
-					parseUrl.query.id.split(',').forEach((el,i,array) => { 
-
-					fs.promises.readFile(__dirname + `/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${el}.json`,
-							'utf8',).then(function (result) {
-							arr.push(JSON.parse(result));
-							if(arr.length === array.length){
-								res.end(JSON.stringify(arr))
+				if (parseUrl.query.id === '') {
+					res.end({ message: 'No record found!' });
+				} else if (parseUrl.query.id !== '' && parseUrl.query.id.split(',').length === 1) {
+					fs.readFile(
+						__dirname +
+							`/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${parseUrl.query.id}.json`,
+						'utf8',
+						function (err, data) {
+							if (err) {
+								console.log('File read failed:', err);
+								throw new Error('File read failed');
 							}
-					}).catch(function (error) {
-							console.log(error);
-					})
-				})
+							res.writeHead(200, { 'Content-Type': 'application/json' });
+							console.log(data);
+							res.end(data);
+						}
+					);
+				} else {
+					console.log('tester');
+					let arr = [];
+					parseUrl.query.id.split(',').forEach((el, i, array) => {
+						fs.promises
+							.readFile(
+								__dirname + `/db/performance-candidate-result-json/SP_SP_Manager_ReportePerformance-${el}.json`,
+								'utf8'
+							)
+							.then(function (result) {
+								arr.push(JSON.parse(result));
+								if (arr.length === array.length) {
+									res.end(JSON.stringify(arr));
+								}
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
+					});
 				}
 			}
 
@@ -144,33 +147,34 @@ const server = http.createServer(async function (req, res) {
 
 		case parseUrl.pathname === '/get/apl' && req.method === 'GET':
 			{
-				if(parseUrl.query.id.split(',').length === 1){
-				fs.readFile(
-					__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${parseUrl.query.id}.json`,
-					'utf8',
-					async function (err, data) {
-						if (err) {
-							console.log('File read failed:', err);
-							throw new Error('File read failed');
-						}
-						res.writeHead(200, { 'Content-Type': 'application/json' });
-						res.end(data);
-					}
-				);
-			}else{
-					let arr = [];
-					parseUrl.query.id.split(',').forEach((el,i,array) => { 
-
-					fs.promises.readFile(__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${el}.json`,
-							'utf8',).then(function (result) {
-							arr.push(JSON.parse(result));
-							if(arr.length === array.length){
-								res.end(JSON.stringify(arr))
+				if (parseUrl.query.id.split(',').length === 1) {
+					fs.readFile(
+						__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${parseUrl.query.id}.json`,
+						'utf8',
+						async function (err, data) {
+							if (err) {
+								console.log('File read failed:', err);
+								throw new Error('File read failed');
 							}
-					}).catch(function (error) {
-							console.log(error);
-					})
-				})
+							res.writeHead(200, { 'Content-Type': 'application/json' });
+							res.end(data);
+						}
+					);
+				} else {
+					let arr = [];
+					parseUrl.query.id.split(',').forEach((el, i, array) => {
+						fs.promises
+							.readFile(__dirname + `/db/apl-candidate-result-json/SP_ReporteAPL-${el}.json`, 'utf8')
+							.then(function (result) {
+								arr.push(JSON.parse(result));
+								if (arr.length === array.length) {
+									res.end(JSON.stringify(arr));
+								}
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
+					});
 				}
 			}
 
@@ -178,33 +182,34 @@ const server = http.createServer(async function (req, res) {
 
 		case parseUrl.pathname === '/get/razi' && req.method === 'GET':
 			{
-				if(parseUrl.query.id.split(',').length === 1){
-				fs.readFile(
-					__dirname + `/db/razi-candidate-result-json/SP_ReporteRazi-${parseUrl.query.id}.json`,
-					'utf8',
-					async function (err, data) {
-						if (err) {
-							console.log('File read failed:', err);
-							throw new Error('File read failed');
-						}
-						res.writeHead(200, { 'Content-Type': 'application/json' });
-						res.end(data);
-					}
-				);
-				}else{
-					let arr = [];
-					parseUrl.query.id.split(',').forEach((el,i,array) => { 
-
-					fs.promises.readFile(__dirname + `/db/razi-candidate-result-json/SP_ReporteRazi-${el}.json`,
-							'utf8',).then(function (result) {
-							arr.push(JSON.parse(result));
-							if(arr.length === array.length){
-								res.end(JSON.stringify(arr))
+				if (parseUrl.query.id.split(',').length === 1) {
+					fs.readFile(
+						__dirname + `/db/razi-candidate-result-json/SP_ReporteRazi-${parseUrl.query.id}.json`,
+						'utf8',
+						async function (err, data) {
+							if (err) {
+								console.log('File read failed:', err);
+								throw new Error('File read failed');
 							}
-					}).catch(function (error) {
-							console.log(error);
-					})
-				})
+							res.writeHead(200, { 'Content-Type': 'application/json' });
+							res.end(data);
+						}
+					);
+				} else {
+					let arr = [];
+					parseUrl.query.id.split(',').forEach((el, i, array) => {
+						fs.promises
+							.readFile(__dirname + `/db/razi-candidate-result-json/SP_ReporteRazi-${el}.json`, 'utf8')
+							.then(function (result) {
+								arr.push(JSON.parse(result));
+								if (arr.length === array.length) {
+									res.end(JSON.stringify(arr));
+								}
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
+					});
 				}
 			}
 
@@ -212,7 +217,6 @@ const server = http.createServer(async function (req, res) {
 
 		case parseUrl.pathname === '/get/test' && req.method === 'GET':
 			{
-	
 				if (parseUrl.query.id.split(',').length === 1) {
 					fs.readFile(
 						__dirname + `/db/ligarprueb-json/ligarprueba_${parseUrl.query.id}.json`,
@@ -227,23 +231,20 @@ const server = http.createServer(async function (req, res) {
 						}
 					);
 				} else {
-
 					let arr = [];
-					parseUrl.query.id.split(',').forEach((el,i,array) => { 
-
-					fs.promises.readFile(__dirname + `/db/ligarprueb-json/ligarprueba_${el}.json`,
-							'utf8',).then(function (result) {
-							arr.push(JSON.parse(result));
-							if(arr.length === array.length){
-								res.end(JSON.stringify(arr))
-							}
-					}).catch(function (error) {
-							console.log(error);
-					})
-
+					parseUrl.query.id.split(',').forEach((el, i, array) => {
+						fs.promises
+							.readFile(__dirname + `/db/ligarprueb-json/ligarprueba_${el}.json`, 'utf8')
+							.then(function (result) {
+								arr.push(JSON.parse(result));
+								if (arr.length === array.length) {
+									res.end(JSON.stringify(arr));
+								}
+							})
+							.catch(function (error) {
+								console.log(error);
+							});
 					});
-
-
 				}
 			}
 

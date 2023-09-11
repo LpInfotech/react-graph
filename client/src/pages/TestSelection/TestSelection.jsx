@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import { FormHelperText, Box, Grid, Button, Typography, Container, FormControl, Select, MenuItem, TextField, Alert, Snackbar } from '@mui/material';
+import {
+	FormHelperText,
+	Box,
+	Grid,
+	Button,
+	Typography,
+	Container,
+	FormControl,
+	Select,
+	MenuItem,
+	TextField,
+	Alert,
+	Snackbar
+} from '@mui/material';
 import BarChart from '../../components/Chart/Chart';
 import { flushSync } from 'react-dom';
 import Table from '../../components/ListTable/ListTable';
@@ -15,7 +28,7 @@ function TestSelection() {
 	const [isSnackbar, setSnackbar] = useState({
 		open: false,
 		vertical: 'bottom',
-		horizontal: 'center',
+		horizontal: 'center'
 	});
 	const [value, setValue] = useState({
 		xAxis: 'razi',
@@ -47,6 +60,8 @@ function TestSelection() {
 	const [isGenerated, setGenerated] = useState(false);
 	const [candidates, setCandidates] = useState([]);
 	const [testData, setTestData] = useState([]);
+	const [getXAxis, setXAxis] = useState([]);
+	const [getYAxis, setYAxis] = useState([]);
 
 	// when component load
 	useEffect(() => {
@@ -109,10 +124,34 @@ function TestSelection() {
 		...new Set(
 			testData
 				.flat()
-				.filter((el) => el.pr_estructura !== 1 && el.pr_estructura !== 2 && el.pr_estructura !== 7 && el.pr_status === 1)
+				.filter(
+					(el) => el.pr_estructura !== 1 && el.pr_estructura !== 2 && el.pr_estructura !== 7 && el.pr_status === 1
+				)
 				.map((el) => el.pr_idCandidato)
 		)
 	].join(',');
+
+	const handleOmmited = () => {
+		let getXAxis =
+			value.xAxis === 'razi'
+				? raziList
+				: value.xAxis === 'apl'
+				? 'aplList'
+				: value.xAxis === 'performance'
+				? performanceList
+				: '';
+
+		let getYAxis =
+			value.yAxis === 'razi'
+				? raziList
+				: value.yAxis === 'apl'
+				? 'aplList'
+				: value.yAxis === 'performance'
+				? performanceList
+				: '';
+		setXAxis(getXAxis);
+		setYAxis(getYAxis);
+	};
 
 	const horizontalTotal = Number(value.xLow) + Number(value.xAverage) + Number(value.xHigh);
 	const verticalTotal = Number(value.yLow) + Number(value.yAverage) + Number(value.yHigh);
@@ -124,18 +163,21 @@ function TestSelection() {
 		setValid({ ...isValid, aplNorm: false, profile: false });
 	} else if (value.xAxis === 'razi' && value.yAxis === 'razi' && (isValid.aplNorm || isValid.profile)) {
 		setValid({ ...isValid, profile: false, aplNorm: false });
-	}
-	else if ((isValid.profile || isValid.aplNorm) && ((value.xAxis === 'performance' && value.yAxis === 'razi') || (value.xAxis === 'razi' && value.yAxis === 'performance'))) {
+	} else if (
+		(isValid.profile || isValid.aplNorm) &&
+		((value.xAxis === 'performance' && value.yAxis === 'razi') ||
+			(value.xAxis === 'razi' && value.yAxis === 'performance'))
+	) {
 		setValid({ ...isValid, profile: false, aplNorm: false });
-	} 
+	}
 
 	// #end region
 
 	//#region events
 
 	const handleAxis = (array) => {
-		let isX = array.every(el => el.x < 100);
-		let isY = array.every(el => el.y < 100);
+		let isX = array.every((el) => el.x < 100);
+		let isY = array.every((el) => el.y < 100);
 		if (isX && isY) {
 			chartConfig.layout.autoPadding = false;
 			chartConfig.scales.x.max = 100;
@@ -145,7 +187,7 @@ function TestSelection() {
 			delete chartConfig.scales.x.max;
 			delete chartConfig.scales.y.max;
 		}
-	}
+	};
 
 	// handle if axis values are same
 	const handleEqualAxis = (xAxis, data) => {
@@ -220,7 +262,6 @@ function TestSelection() {
 			flushSync(() => {
 				setPosition(array);
 			});
-
 		} else if (xAxis === 'apl' && aplList !== '') {
 			let aplData;
 			if (aplList.split(',').length > 1) {
@@ -270,7 +311,7 @@ function TestSelection() {
 		} else {
 			setPosition([]);
 			setPrint(false);
-			setSnackbar({ ...isSnackbar, open: true })
+			setSnackbar({ ...isSnackbar, open: true });
 		}
 		setGenerated((prev) => !prev);
 	};
@@ -279,7 +320,12 @@ function TestSelection() {
 	const handlePositionData = (data, xAxis, yAxis) => {
 		let positionX, positionY;
 
-		if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'apl' || xAxis === 'apl') && raziList !== '' && aplList !== '') {
+		if (
+			(xAxis === 'apl&razi' || yAxis === 'apl&razi') &&
+			(yAxis === 'apl' || xAxis === 'apl') &&
+			raziList !== '' &&
+			aplList !== ''
+		) {
 			let array;
 			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
 			positionX = data[1]
@@ -378,7 +424,12 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-		} else if ((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (yAxis === 'razi' || xAxis === 'razi') && raziList !== '' && aplList !== '') {
+		} else if (
+			(xAxis === 'apl&razi' || yAxis === 'apl&razi') &&
+			(yAxis === 'razi' || xAxis === 'razi') &&
+			raziList !== '' &&
+			aplList !== ''
+		) {
 			let array;
 			let aplRaziIndex = xAxis === 'apl&razi' ? 0 : 1;
 
@@ -404,27 +455,27 @@ function TestSelection() {
 				array =
 					aplRaziIndex === 1
 						? positionX.map((el, i) => {
-							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-							return {
-								x: el._resultadofinal,
-								y: aplAndRazi,
-								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: bubbleRadius,
-								name: candidates.find((elm) => elm.can_id === el._idCandidato)
-							};
-						})
+								let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
+								let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+								return {
+									x: el._resultadofinal,
+									y: aplAndRazi,
+									label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+									r: bubbleRadius,
+									name: candidates.find((elm) => elm.can_id === el._idCandidato)
+								};
+						  })
 						: positionX.map((el, i) => {
-							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-							return {
-								x: aplAndRazi,
-								y: el._resultadofinal,
-								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: bubbleRadius,
-								name: candidates.find((elm) => elm.can_id === el._idCandidato)
-							};
-						});
+								let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
+								let aplAndRazi = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+								return {
+									x: aplAndRazi,
+									y: el._resultadofinal,
+									label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+									r: bubbleRadius,
+									name: candidates.find((elm) => elm.can_id === el._idCandidato)
+								};
+						  });
 			} else {
 				positionY = data[0]
 					.flat()
@@ -440,27 +491,27 @@ function TestSelection() {
 				array =
 					aplRaziIndex === 1
 						? positionX.map((el, i) => {
-							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-							return {
-								x: el._resultadofinal,
-								y: apl,
-								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: bubbleRadius,
-								name: candidates.find((elm) => elm.can_id === el._idCandidato)
-							};
-						})
+								let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
+								let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+								return {
+									x: el._resultadofinal,
+									y: apl,
+									label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+									r: bubbleRadius,
+									name: candidates.find((elm) => elm.can_id === el._idCandidato)
+								};
+						  })
 						: positionX.map((el, i) => {
-							let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
-							let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
-							return {
-								x: apl,
-								y: el._resultadofinal,
-								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-								r: bubbleRadius,
-								name: candidates.find((elm) => elm.can_id === el._idCandidato)
-							};
-						});
+								let aplValue = positionY.find((elm) => elm._idCandidato === el._idCandidato).calceranking;
+								let apl = aplValue * (value.aplWeight / 100) + el._resultadofinal * (value.raziWeight / 100);
+								return {
+									x: apl,
+									y: el._resultadofinal,
+									label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+									r: bubbleRadius,
+									name: candidates.find((elm) => elm.can_id === el._idCandidato)
+								};
+						  });
 			}
 
 			handleAxis(array);
@@ -470,7 +521,12 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-		} else if ((xAxis === 'apl' || xAxis === 'razi') && (yAxis === 'razi' || yAxis === 'apl') && raziList !== '' && aplList !== '') {
+		} else if (
+			(xAxis === 'apl' || xAxis === 'razi') &&
+			(yAxis === 'razi' || yAxis === 'apl') &&
+			raziList !== '' &&
+			aplList !== ''
+		) {
 			let aplPosition = xAxis === 'apl' ? 0 : 1;
 			let raziPosition = xAxis === 'razi' ? 0 : 1;
 			positionY = data[raziPosition]
@@ -504,23 +560,26 @@ function TestSelection() {
 					});
 			}
 
-			let array = aplPosition === 0 ? positionY.map((el, i, array) => {
-				return {
-					x: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
-					y: el._resultadofinal,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			}) : positionY.map((el, i) => {
-				return {
-					x: el._resultadofinal,
-					y: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			});
+			let array =
+				aplPosition === 0
+					? positionY.map((el, i, array) => {
+							return {
+								x: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
+								y: el._resultadofinal,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  })
+					: positionY.map((el, i) => {
+							return {
+								x: el._resultadofinal,
+								y: positionX.find((elm) => elm._idCandidato === el._idCandidato).calceranking,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  });
 
 			handleAxis(array);
 
@@ -528,7 +587,12 @@ function TestSelection() {
 				setPosition(array);
 			});
 			setPrint(true);
-		} else if ((xAxis === 'razi' || xAxis === 'performance') && (yAxis === 'performance' || yAxis === 'razi') && raziList !== '' && performanceList !== '') {
+		} else if (
+			(xAxis === 'razi' || xAxis === 'performance') &&
+			(yAxis === 'performance' || yAxis === 'razi') &&
+			raziList !== '' &&
+			performanceList !== ''
+		) {
 			let raziPosition = xAxis === 'razi' ? 0 : 1;
 			let performancePosition = xAxis === 'performance' ? 0 : 1;
 			positionX = data[raziPosition]
@@ -549,24 +613,26 @@ function TestSelection() {
 					.filter((elm, i, arr) => arr.findIndex((el) => el.porcentaje === elm.porcentaje) === i);
 			}
 
-
-			let array = raziPosition === 0 ? positionX.map((el, i) => {
-				return {
-					x: el._resultadofinal,
-					y: positionY[i].porcentaje,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			}) : positionX.map((el, i) => {
-				return {
-					x: positionY[i].porcentaje,
-					y: el._resultadofinal,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			});
+			let array =
+				raziPosition === 0
+					? positionX.map((el, i) => {
+							return {
+								x: el._resultadofinal,
+								y: positionY[i].porcentaje,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  })
+					: positionX.map((el, i) => {
+							return {
+								x: positionY[i].porcentaje,
+								y: el._resultadofinal,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  });
 
 			handleAxis(array);
 
@@ -575,7 +641,6 @@ function TestSelection() {
 			});
 
 			setPrint(true);
-
 		} else if ((xAxis === 'apl' || xAxis === 'performance') && (yAxis === 'performance' || yAxis === 'apl')) {
 			let aplPosition = xAxis === 'apl' ? 0 : 1;
 			let performancePosition = xAxis === 'performance' ? 0 : 1;
@@ -623,27 +688,30 @@ function TestSelection() {
 				);
 			}
 
-			let array = aplPosition === 0 ? positionX.map((el, i) => {
-				return {
-					x: el.calceranking,
-					y: positionY[i].porcentaje,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			}) : positionX.map((el, i) => {
-				return {
-					x: positionY[i].porcentaje,
-					y: el.calceranking,
-					label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
-					r: bubbleRadius,
-					name: candidates.find((elm) => elm.can_id === el._idCandidato)
-				};
-			});
+			let array =
+				aplPosition === 0
+					? positionX.map((el, i) => {
+							return {
+								x: el.calceranking,
+								y: positionY[i].porcentaje,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  })
+					: positionX.map((el, i) => {
+							return {
+								x: positionY[i].porcentaje,
+								y: el.calceranking,
+								label: candidates.find((elm) => elm.can_id === el._idCandidato).index,
+								r: bubbleRadius,
+								name: candidates.find((elm) => elm.can_id === el._idCandidato)
+							};
+					  });
 
 			handleAxis(array);
 
-			console.log(array)
+			console.log(array);
 
 			flushSync(() => {
 				setPosition(array);
@@ -653,7 +721,7 @@ function TestSelection() {
 		} else {
 			setPosition([]);
 			setPrint(false);
-			setSnackbar({ ...isSnackbar, open: true })
+			setSnackbar({ ...isSnackbar, open: true });
 		}
 		chartRef.current.update();
 		setGenerated((prev) => !prev);
@@ -662,29 +730,29 @@ function TestSelection() {
 	// handle if axis values are different
 	const handleNotEqualAxis = async (xAxis, yAxis) => {
 		const xId =
-			(xAxis) === 'apl'
+			xAxis === 'apl'
 				? aplList
-				: (xAxis) === 'performance'
-					? performanceList
-					: xAxis === 'razi'
-						? raziList
-						: (xAxis) === 'apl&razi'
-							? aplList
-							: '';
+				: xAxis === 'performance'
+				? performanceList
+				: xAxis === 'razi'
+				? raziList
+				: xAxis === 'apl&razi'
+				? aplList
+				: '';
 		const yId =
-			(yAxis) === 'apl'
+			yAxis === 'apl'
 				? aplList
-				: (yAxis) === 'performance'
-					? performanceList
-					: yAxis === 'razi'
-						? raziList
-						: (yAxis) === 'apl&razi'
-							? aplList
-							: '';
+				: yAxis === 'performance'
+				? performanceList
+				: yAxis === 'razi'
+				? raziList
+				: yAxis === 'apl&razi'
+				? aplList
+				: '';
 		let xPosition, yPosition;
 		try {
 			// check if test include the apl+razi
-			if (xId !== "" && yId !== "") {
+			if (xId !== '' && yId !== '') {
 				if (
 					(xAxis === 'apl&razi' && (yAxis === 'razi' || yAxis === 'apl' || yAxis === 'performance')) ||
 					(yAxis === 'apl&razi' && (xAxis === 'razi' || xAxis === 'apl' || xAxis === 'performance'))
@@ -699,15 +767,16 @@ function TestSelection() {
 			} else {
 				setPrint(false);
 				setPosition([]);
-				setSnackbar({ ...isSnackbar, open: true })
+				setSnackbar({ ...isSnackbar, open: true });
 			}
 		} catch (e) {
 			setPrint(false);
 			setPosition([]);
-			setSnackbar({ ...isSnackbar, open: true })
+			setSnackbar({ ...isSnackbar, open: true });
 		}
 
-		xId && yId !== '' &&
+		xId &&
+			yId !== '' &&
 			Promise.all([xPosition, yPosition])
 				.then((data) => {
 					handlePositionData(data, xAxis, yAxis);
@@ -783,7 +852,7 @@ function TestSelection() {
 				} else {
 					setPosition([]);
 					setPrint(false);
-					setSnackbar({ ...isSnackbar, open: true })
+					setSnackbar({ ...isSnackbar, open: true });
 				}
 			})
 			.catch((e) => {
@@ -798,20 +867,20 @@ function TestSelection() {
 			xAxis === 'apl'
 				? aplList
 				: xAxis === 'performance'
-					? performanceList
-					: xAxis === 'razi'
-						? raziList
-						: xAxis === 'apl&razi'
-							? aplList
-							: '';
+				? performanceList
+				: xAxis === 'razi'
+				? raziList
+				: xAxis === 'apl&razi'
+				? aplList
+				: '';
 		const url = '/get/' + xAxis + '?id=' + id;
 
-		if (id !== "") {
+		if (id !== '') {
 			// if same position
 			if (xAxis === yAxis) {
 				if (xAxis === 'apl' && (value.profile === '' || value.aplNorm === '')) {
 					handleErrors();
-				} else if ((xAxis === 'apl&razi') && (value.profile === '' || value.aplNorm === '')) {
+				} else if (xAxis === 'apl&razi' && (value.profile === '' || value.aplNorm === '')) {
 					handleAplRaziErrors();
 				} else if (xAxis === 'apl&razi') {
 					let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
@@ -832,37 +901,53 @@ function TestSelection() {
 						setPrint(false);
 					}
 				}
-			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'razi' || yAxis === 'razi')) &&
-				(value.profile === '' || value.aplNorm === '')) {
+			} else if (
+				(xAxis === 'apl' || yAxis === 'apl') &&
+				(xAxis === 'razi' || yAxis === 'razi') &&
+				(value.profile === '' || value.aplNorm === '')
+			) {
 				handleAplRaziErrors();
-			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
-				(value.profile === '' || value.aplNorm === '')) {
+			} else if (
+				(xAxis === 'apl' || yAxis === 'apl') &&
+				(xAxis === 'apl&razi' || yAxis === 'apl&razi') &&
+				(value.profile === '' || value.aplNorm === '')
+			) {
 				handleAplRaziErrors();
-			} else if (((xAxis === 'razi' || yAxis === 'razi') && (xAxis === 'apl&razi' || yAxis === 'apl&razi')) &&
-				(value.profile === '' || value.aplNorm === '')) {
+			} else if (
+				(xAxis === 'razi' || yAxis === 'razi') &&
+				(xAxis === 'apl&razi' || yAxis === 'apl&razi') &&
+				(value.profile === '' || value.aplNorm === '')
+			) {
 				handleAplRaziErrors();
-			} else if (((xAxis === 'apl' || yAxis === 'apl') && (xAxis === 'performance' || yAxis === 'performance')) && (value.profile === '' || value.aplNorm === '')) {
+			} else if (
+				(xAxis === 'apl' || yAxis === 'apl') &&
+				(xAxis === 'performance' || yAxis === 'performance') &&
+				(value.profile === '' || value.aplNorm === '')
+			) {
 				handleErrors();
-			} else if (((xAxis === 'apl&razi' || yAxis === 'apl&razi') && (xAxis === 'performance' || yAxis === 'performance')) && (value.profile === '' || value.aplNorm === '')) {
+			} else if (
+				(xAxis === 'apl&razi' || yAxis === 'apl&razi') &&
+				(xAxis === 'performance' || yAxis === 'performance') &&
+				(value.profile === '' || value.aplNorm === '')
+			) {
 				handleAplRaziErrors();
-			}
-			else {
+			} else {
 				setValid({ ...isValid, aplNorm: false, profile: false });
 				await handleNotEqualAxis(xAxis, yAxis);
 			}
-		}
-		else {
+		} else {
 			setPosition([]);
 			setPrint(false);
-			setSnackbar({ ...isSnackbar, open: true })
+			setSnackbar({ ...isSnackbar, open: true });
 		}
-
 	};
 
 	// handle errors
 	const handleErrors = () => {
 		if (value.profile === '' && value.aplNorm === '') {
-			setValid(isValid => { return { ...isValid, profile: true, aplNorm: true } });
+			setValid((isValid) => {
+				return { ...isValid, profile: true, aplNorm: true };
+			});
 		} else if (value.profile === '') {
 			setValid({ ...isValid, profile: true });
 		} else if (value.aplNorm === '') {
@@ -872,15 +957,15 @@ function TestSelection() {
 
 	const handleAplRaziErrors = () => {
 		if (value.profile === '' && value.aplNorm === '') {
-			setValid({ ...isValid, aplNorm: true, profile: true })
+			setValid({ ...isValid, aplNorm: true, profile: true });
 		} else if (value.profile === '' && value.aplNorm === '') {
-			setValid({ ...isValid, aplNorm: true, profile: true })
+			setValid({ ...isValid, aplNorm: true, profile: true });
 		} else if (value.profile === '') {
-			setValid({ ...isValid, profile: true })
+			setValid({ ...isValid, profile: true });
 		} else if (value.aplNorm === '') {
-			setValid({ ...isValid, aplNorm: true })
+			setValid({ ...isValid, aplNorm: true });
 		}
-	}
+	};
 
 	// get position
 	const getPosition = async (xAxis, yAxis) => {
@@ -919,12 +1004,15 @@ function TestSelection() {
 	return (
 		<>
 			{/* filter section */}
-			<Box component={'section'} sx={{
-				'@media print and (min-width: 320px)': {
-					printColorAdjust: 'exact',
-					WebkitPrintColorAdjust: 'exact',
-				},
-			}}>
+			<Box
+				component={'section'}
+				sx={{
+					'@media print and (min-width: 320px)': {
+						printColorAdjust: 'exact',
+						WebkitPrintColorAdjust: 'exact'
+					}
+				}}
+			>
 				<Container
 					maxWidth="xxl"
 					sx={{
@@ -1064,13 +1152,13 @@ function TestSelection() {
 						{(value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') && (
 							<>
 								<Grid item xs={12} marginTop={2} marginBottom={2} displayPrint={'none'}>
-									<Alert
-										variant="outlined"
-										severity={'info'}
-									>
-										You selected the APL + Razi option. Please enter the apl and razi weight and
-										make sure that the total weight of Apl and razi is not greater than 100. <br />
-										The current total weight is  <Box component={'span'} fontWeight={600}>{Number(value.aplWeight) + Number(value.raziWeight)}.</Box>
+									<Alert variant="outlined" severity={'info'}>
+										You selected the APL + Razi option. Please enter the apl and razi weight and make sure that the
+										total weight of Apl and razi is not greater than 100. <br />
+										The current total weight is{' '}
+										<Box component={'span'} fontWeight={600}>
+											{Number(value.aplWeight) + Number(value.raziWeight)}.
+										</Box>
 									</Alert>
 								</Grid>
 								<Grid item xs={12} md={3} sm={6} marginTop={2} marginBottom={2} displayPrint={'none'}>
@@ -1227,7 +1315,7 @@ function TestSelection() {
 							</FormControl>
 						</Grid>
 						{(isValid.horizontalChartError || isValid.verticalChartError) && (
-							<Grid item displayPrint={'none'} xs={12} sx={{ mt: 4, }}>
+							<Grid item displayPrint={'none'} xs={12} sx={{ mt: 4 }}>
 								<Alert
 									variant="outlined"
 									severity={horizontalTotal !== 100 || verticalTotal !== 100 ? 'warning' : 'success'}
@@ -1273,37 +1361,44 @@ function TestSelection() {
 						<Grid item xs={12} displayPrint={'none'} textAlign="right" sx={{ my: 4 }}>
 							<Button
 								variant="contained"
-								disabled={isValid.profile || isValid.aplNorm || ((value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') && (Number(value.aplWeight) + Number(value.raziWeight) !== 100))}
-								onClick={(e) => getPosition(value.xAxis, value.yAxis)}
+								disabled={
+									isValid.profile ||
+									isValid.aplNorm ||
+									((value.xAxis === 'apl&razi' || value.yAxis === 'apl&razi') &&
+										Number(value.aplWeight) + Number(value.raziWeight) !== 100)
+								}
+								onClick={(e) => {
+									getPosition(value.xAxis, value.yAxis);
+									handleOmmited();
+								}}
 							>
 								Generate
 							</Button>
-							{(isPrint && !isValid.profile && !isValid.aplNorm) && (
+							{isPrint && !isValid.profile && !isValid.aplNorm && (
 								<Button
 									variant="contained"
 									sx={{
 										ml: 5,
 										'@media print and (min-width: 320px)': {
-											display: 'none',
-										},
+											display: 'none'
+										}
 									}}
 									onClick={() => {
 										flushSync(() => {
 											chartRef.current.resize();
 										});
-										setTimeout(() => window.print(), 500);
 									}}
 								>
 									Print
 								</Button>
 							)}
 						</Grid>
-						<Grid item xs={12} lg={3} marginBottom={3} displayPrint='block'>
+						<Grid item xs={12} lg={3} marginBottom={3} displayPrint="block">
 							<FormControl fullWidth>
 								<Box marginBottom={4} fontWeight={600} textTransform="capitalize" paddingTop={4}>
 									Selected List
 								</Box>
-								<Table data={candidates} />
+								<Table data={candidates} xOmmited={getXAxis} yOmmited={getYAxis} />
 							</FormControl>
 						</Grid>
 						<Grid
@@ -1316,7 +1411,7 @@ function TestSelection() {
 								flexGrow: 1,
 								'@media print and (min-width: 320px)': {
 									flexGrow: 0,
-									breakInside: 'avoid',
+									breakInside: 'avoid'
 								},
 								'@media screen and (max-width: 576px)': {
 									flexGrow: 0
