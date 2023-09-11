@@ -22,8 +22,6 @@ export default function BasicTable({ data, xOmmited, yOmmited }) {
 			(yOmmited !== undefined && yOmmited.length > 0 && !getresult.find((y) => x.can_id === +y))
 	);
 
-	console.log(result);
-
 	return (
 		<TableContainer
 			component={Paper}
@@ -44,7 +42,7 @@ export default function BasicTable({ data, xOmmited, yOmmited }) {
 							</TableCell>
 							<TableCell
 								sx={{
-									color: result.map((i) => (i.can_id === row.can_id ? 'red' : ''))
+									color: result.map((i) => (i.can_id === row.can_id ? 'yellow' : ''))
 								}}
 							>
 								{row.name}

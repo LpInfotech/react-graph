@@ -136,7 +136,7 @@ function TestSelection() {
 			value.xAxis === 'razi'
 				? raziList
 				: value.xAxis === 'apl'
-				? 'aplList'
+				? aplList
 				: value.xAxis === 'performance'
 				? performanceList
 				: '';
@@ -145,7 +145,7 @@ function TestSelection() {
 			value.yAxis === 'razi'
 				? raziList
 				: value.yAxis === 'apl'
-				? 'aplList'
+				? aplList
 				: value.yAxis === 'performance'
 				? performanceList
 				: '';
