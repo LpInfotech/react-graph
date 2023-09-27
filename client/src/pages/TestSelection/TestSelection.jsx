@@ -124,9 +124,7 @@ function TestSelection() {
 		...new Set(
 			testData
 				.flat()
-				.filter(
-					(el) => el.pr_estructura !== 1 && el.pr_estructura !== 2 && el.pr_estructura !== 7 && el.pr_status === 1
-				)
+				.filter((el, i) => el.porcentaje === i.porcentaje)
 				.map((el) => el.pr_idCandidato)
 		)
 	].join(',');
@@ -885,8 +883,9 @@ function TestSelection() {
 				} else if (xAxis === 'apl&razi') {
 					let apl = await fetch('/get/apl?id=' + id).then((response) => response.json());
 					let razi = await fetch('/get/razi?id=' + id).then((response) => response.json());
-					Promise.all([apl, razi]);
-					handleAplAndRazi(Promise.all([apl, razi]));
+					let performance = await fetch('/get/performance?id=' + id).then((response) => response.json());
+					Promise.all([apl, razi, performance]);
+					handleAplAndRazi(Promise.all([apl, razi, performance]));
 				} else {
 					try {
 						setValid({ ...isValid, aplNorm: false });
